@@ -5,6 +5,6 @@ function getUserData() {
 }
 
 function saveUserData(callback) {
-	const new_data = callback(getUserData());
+	const new_data = callback(getUserData()) || {};
 	localStorage.setItem('data', JSON.stringify(new_data));
 }

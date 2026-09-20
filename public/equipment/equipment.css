@@ -1,0 +1,24 @@
+.checkboxes {
+	margin-top: 1.5rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.checkbox {
+	display: flex;
+	gap: 0.7rem;
+
+	& input {
+		width: 1rem;
+		border-radius: 0px;
+
+		&:not(:checked) + span {
+			opacity: 0.3;
+		}
+	}
+}
+
+.personality {
+	font-weight: bold;
+}

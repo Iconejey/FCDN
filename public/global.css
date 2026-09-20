@@ -47,4 +47,14 @@ a.btn {
 	padding: 0.7rem 1.1rem;
 	font-weight: bold;
 	margin-top: 2rem;
+	user-select: none;
+
+	&[disabled] {
+		opacity: 0.3;
+		pointer-events: none;
+	}
+}
+
+.hidden {
+	display: none;
 }
