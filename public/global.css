@@ -40,6 +40,57 @@ p {
 	gap: 1rem;
 }
 
+.v-split {
+	display: flex;
+	width: 100%;
+	gap: 1rem;
+	justify-content: stretch;
+	margin-top: 1rem;
+
+	& > * {
+		flex: 1;
+	}
+}
+
+.h-split {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+data-box {
+	border: 2px solid black;
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	padding: 1rem;
+
+	& .data-box-title {
+		text-align: center;
+		font-weight: bold;
+
+		&:empty {
+			display: none;
+		}
+	}
+
+	& .data-box-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+
+		& .data-box-item {
+			display: flex;
+			justify-content: space-between;
+			gap: 1rem;
+
+			& .data-box-item-value {
+				font-weight: bold;
+			}
+		}
+	}
+}
+
 a.btn {
 	border: 2px solid black;
 	color: black;
