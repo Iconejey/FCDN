@@ -8,6 +8,7 @@ class BillyPage extends CustomComponent {
 		this.innerHTML = html`
 			<h1>Billy <span id="personality"></span></h1>
 			<p id="description"></p>
+			<page-btn page="dashboard">Retour</page-btn>
 		`;
 
 		const user_data = getUserData();

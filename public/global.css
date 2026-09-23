@@ -6,7 +6,7 @@
 
 body {
 	padding: 3rem 2rem;
-	font-size: 20px;
+	font-size: 18px;
 }
 
 img {
@@ -84,8 +84,8 @@ data-box {
 			justify-content: space-between;
 			gap: 1rem;
 
-			&.bullet .data-box-item-label::marker {
-				margin-right: 0px !important;
+			&.bullet .data-box-item-label {
+				margin-left: 1rem;
 			}
 
 			&:not(.bullet) .data-box-item-label {
@@ -99,7 +99,7 @@ data-box {
 	}
 }
 
-a.btn {
+.btn {
 	border: 2px solid black;
 	color: black;
 	text-decoration: none;
@@ -107,6 +107,7 @@ a.btn {
 	font-weight: bold;
 	margin-top: 2rem;
 	user-select: none;
+	cursor: pointer;
 
 	&[disabled] {
 		opacity: 0.3;

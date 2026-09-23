@@ -1,13 +1,22 @@
 class EquipmentPage extends CustomComponent {
 	static selectors = {
 		$checkboxes: '.checkboxes',
+		$$selected: '.checkboxes input:checked',
 		$validate_btn: '#validate',
 		$personality: '.personality',
 		$main_stats: '#main-stats',
 		$second_stats: '#second-stats',
 		$billy_p: '#billy-p',
-		$v_split: '#v-split'
+		$stats: '.v-split'
 	};
+
+	get selected_equipment() {
+		return [...this.$$selected].map(c => equipment_options.find(o => o.label === c.nextElementSibling.innerText));
+	}
+
+	get selected_labels() {
+		return this.selected_equipment.map(eq => eq.label);
+	}
 
 	connectedCallback() {
 		this.innerHTML = html`
@@ -16,51 +25,36 @@ class EquipmentPage extends CustomComponent {
 
 			<div class="checkboxes"></div>
 
-			<div class="centering hidden" id="v-split">
-				<div class="vertical-split">
-					<p id="billy-p">Ton Billy est <span class="personality"></span> !</p>
-					<div class="stats">
-						<data-box id="main-stats"></data-box>
-						<data-box id="second-stats"></data-box>
-					</div>
-				</div>
+			<p id="billy-p" class="hidden">Ton Billy est <span class="personality"></span> !</p>
+			<div class="v-split stats hidden">
+				<data-box id="main-stats"></data-box>
+				<data-box id="second-stats"></data-box>
 			</div>
 
 			<div class="centering">
-				<a class="btn" href="/dashboard" id="validate" disabled>Continuer</a>
+				<page-btn page="dashboard" id="validate" disabled>Continuer</page-btn>
 			</div>
 		`;
 
-		// Set static titles for components
-		this.$main_stats.title = 'Caractéristiques principales';
-		this.$second_stats.title = 'Caractéristiques secondaires';
-
-		let selected_equipment = [];
-
 		for (const option of equipment_options) {
-			const checkbox_label = document.createElement('label');
-			checkbox_label.className = 'checkbox';
-			checkbox_label.innerHTML = `
+			const checkbox_label = emmet`label.checkbox`;
+			checkbox_label.innerHTML = html`
 				<input type="checkbox" />
 				<span>${option.label}</span>
 			`;
 
-			checkbox_label.querySelector('input').onchange = e => {
-				const selected_checkboxes = this.$checkboxes.querySelectorAll('input:checked');
-
-				if (selected_checkboxes.length > 3) {
+			checkbox_label.$('input').onchange = e => {
+				if (this.$$selected.length > 3) {
 					e.target.checked = false;
 					return;
 				}
 
-				selected_equipment = [...selected_checkboxes].map(c => equipment_options.find(o => o.label === c.nextElementSibling.innerText));
-
-				if (selected_checkboxes.length === 3) {
+				if (this.$$selected.length === 3) {
 					this.$validate_btn.removeAttribute('disabled');
 					this.$billy_p.classList.remove('hidden');
-					this.$v_split.classList.remove('hidden');
+					this.$stats.classList.remove('hidden');
 
-					const info = getBillyInfo({ equipment: selected_equipment.map(eq => eq.label) });
+					const info = getBillyInfo({ equipment: this.selected_labels });
 					this.$personality.innerText = info.personality;
 
 					const $main_stats = [];
@@ -73,20 +67,14 @@ class EquipmentPage extends CustomComponent {
 				} else {
 					this.$validate_btn.setAttribute('disabled', '');
 					this.$billy_p.classList.add('hidden');
-					this.$v_split.classList.add('hidden');
+					this.$stats.classList.add('hidden');
 				}
 			};
 
 			this.$checkboxes.appendChild(checkbox_label);
 		}
 
-		this.$validate_btn.onclick = e => {
-			e.preventDefault();
-			saveUserData(old => ({
-				equipment: selected_equipment.map(eq => eq.label)
-			}));
-			navigate('/dashboard');
-		};
+		this.$validate_btn.before = e => saveUserData(old => ({ equipment: this.selected_labels }));
 	}
 }
 
