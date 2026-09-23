@@ -1,4 +1,4 @@
-class BillyPage extends CustomComponent {
+class StatsPage extends CustomComponent {
 	static selectors = {
 		$personality: '#personality',
 		$description: '#description'
@@ -20,4 +20,4 @@ class BillyPage extends CustomComponent {
 	}
 }
 
-register(BillyPage);
+register(StatsPage);

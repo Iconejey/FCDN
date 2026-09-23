@@ -32,7 +32,7 @@ class EquipmentPage extends CustomComponent {
 			</div>
 
 			<div class="centering">
-				<page-btn page="dashboard" id="validate" disabled>Continuer</page-btn>
+				<page-btn page="stats" id="validate" disabled>Continuer</page-btn>
 			</div>
 		`;
 
