@@ -84,6 +84,14 @@ data-box {
 			justify-content: space-between;
 			gap: 1rem;
 
+			&.bullet .data-box-item-label::marker {
+				margin-right: 0px !important;
+			}
+
+			&:not(.bullet) .data-box-item-label {
+				list-style-type: none;
+			}
+
 			& .data-box-item-value {
 				font-weight: bold;
 			}

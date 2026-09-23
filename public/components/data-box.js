@@ -20,7 +20,7 @@ class DataBox extends HTMLElement {
 			if (item.bullet) $item.classList.add('bullet');
 
 			$item.innerHTML = `
-				<span class="data-box-item-label">${item.label}</span>
+				<li class="data-box-item-label">${item.label}</li>
 				<span class="data-box-item-value">${item.value}</span>
 			`;
 
