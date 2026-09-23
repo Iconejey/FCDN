@@ -5,12 +5,32 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>FCDN</title>
 
-		<!-- Scripts -->
-		<script delay src="./global.js"></script>
-		<script>
-			if (!getUserData()) location.replace('./welcome');
-			else location.replace('./dashboard');
-		</script>
+		<!-- Stylesheets -->
+		<link rel="stylesheet" href="/global.css" type="text/css" />
+		<link rel="stylesheet" href="/nolib/common.css" type="text/css" />
+		<link rel="stylesheet" href="/equipment.css" type="text/css" />
+
+		<!-- Nolib scripts -->
+		<script src="/nolib/utils.js"></script>
+		<script src="/nolib/store.js"></script>
+		<script src="/nolib/components.js"></script>
+
+		<!-- Global script (defines equipment_options, personalities, saveUserData, getUserData, getBillyInfo) -->
+		<script src="/global.js"></script>
+
+		<!-- Local components -->
+		<script src="/components/data-box.js"></script>
+
+		<!-- Page components -->
+		<script src="/pages/welcome-page.js"></script>
+		<script src="/pages/equipment-page.js"></script>
+		<script src="/pages/billy-page.js"></script>
+		<script src="/pages/dashboard-page.js"></script>
+
+		<!-- SPA Router / App script -->
+		<script src="/app.js"></script>
 	</head>
-	<body></body>
+	<body>
+		<div id="app"></div>
+	</body>
 </html>

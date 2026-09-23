@@ -1,32 +1,34 @@
-class DataBox extends HTMLElement {
+class DataBox extends CustomComponent {
+	static selectors = {
+		$title: '.data-box-title',
+		$list: '.data-box-list'
+	};
+
 	connectedCallback() {
-		this.innerHTML = `
+		this.innerHTML = html`
 			<span class="data-box-title"></span>
 			<div class="data-box-list"></div>
 		`;
 	}
 
 	set title(value) {
-		this.querySelector('.data-box-title').innerText = value;
+		this.$title.innerText = value;
 	}
 
 	show(list) {
-		const $list = this.querySelector('.data-box-list');
-		$list.innerHTML = '';
+		this.$list.innerHTML = '';
 
 		for (const item of list) {
-			const $item = document.createElement('div');
-			$item.classList.add('data-box-item');
-			if (item.bullet) $item.classList.add('bullet');
+			const $item = emmet`div.data-box-item${item.bullet ? '.bullet' : ''}`;
 
-			$item.innerHTML = `
+			$item.innerHTML = html`
 				<li class="data-box-item-label">${item.label}</li>
 				<span class="data-box-item-value">${item.value}</span>
 			`;
 
-			$list.appendChild($item);
+			this.$list.appendChild($item);
 		}
 	}
 }
 
-customElements.define('data-box', DataBox);
+register(DataBox);
