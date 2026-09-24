@@ -5,8 +5,10 @@ class DataBox extends CustomComponent {
 	};
 
 	connectedCallback() {
+		const title = this.getAttribute('title') || '';
+
 		this.innerHTML = html`
-			<span class="data-box-title"></span>
+			<span class="data-box-title">${title}</span>
 			<div class="data-box-list"></div>
 		`;
 	}
