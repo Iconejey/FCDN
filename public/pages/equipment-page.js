@@ -36,14 +36,7 @@ class EquipmentPage extends CustomComponent {
 			</div>
 		`;
 
-		let user_data = {
-			equipment: [],
-			pv: 0,
-			chance: 0,
-			glory: 0,
-			wealth: 0,
-			bonuses: { hab: 0, adr: 0, end: 0, cha: 0, deg: 0, arm: 0, crit: 0, pv_max: 0 }
-		};
+		let user_data = default_user_data;
 
 		for (const option of equipment_options) {
 			const checkbox_label = emmet`label.checkbox`;

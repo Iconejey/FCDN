@@ -35,12 +35,22 @@ class DataBox extends CustomComponent {
 				$item.$('.remove-btn').onclick = () => item.incr(-1);
 				$item.$('.add-btn').onclick = () => item.incr(1);
 			} else {
-				const $item = this.$list.appendChild(emmet`div.data-box-item${item.bullet ? '.bullet' : ''}${item.bold ? '.bold' : ''}`);
+				const $item = this.$list.appendChild(emmet`div.data-box-item`);
+				if (item.bullet) $item.classList.add('bullet');
+				if (item.bold) $item.classList.add('bold');
+				if (item.gray) $item.classList.add('gray');
+				if (item.select) $item.classList.add('select');
 
 				$item.innerHTML = html`
-					<li class="data-box-item-label">${item.label}</li>
-					<span class="data-box-item-value">${item.value}</span>
+					<li class="data-box-item-label">${item.label || ''}</li>
+					<span class="data-box-item-value">${item.value || ''}</span>
 				`;
+
+				$item.oncontextmenu = e => {
+					e.preventDefault();
+					e.stopPropagation();
+					item.onSelect?.();
+				};
 			}
 		}
 	}

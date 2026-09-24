@@ -33,6 +33,17 @@ const personalities = {
 	DÉBROUILLARD: { adr: 2, end: -1, description: "Vous pouvez relancer le dé une fois lors de la phase d'attaque pour espérer faire mieux." }
 };
 
+const default_user_data = {
+	equipment: [],
+	pv: 0,
+	chance: 0,
+	glory: 0,
+	wealth: 0,
+	bonuses: { hab: 0, adr: 0, end: 0, cha: 0, deg: 0, arm: 0, crit: 0, pv_max: 0 },
+	collected_items: [],
+	adventure_notes: []
+};
+
 // Get user data
 function getUserData() {
 	const string_data = localStorage.getItem('data');

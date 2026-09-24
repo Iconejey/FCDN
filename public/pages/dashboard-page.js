@@ -3,7 +3,9 @@ class DashboardPage extends CustomComponent {
 		$pv: '#pv',
 		$chance: '#chance',
 		$glory: '#glory',
-		$wealth: '#wealth'
+		$wealth: '#wealth',
+		$collected_items: '#collected-items',
+		$adventure_notes: '#adventure-notes'
 	};
 
 	connectedCallback() {
@@ -28,6 +30,14 @@ class DashboardPage extends CustomComponent {
 				<data-box id="wealth" title="RICHESSE" />
 			</div>
 
+			<div class="v-split">
+				<data-box id="collected-items" title="OBJETS RÉCUPÉRÉS" />
+			</div>
+
+			<div class="v-split">
+				<data-box id="adventure-notes" title="NOTES D'AVENTURE" />
+			</div>
+
 			<page-btn page="stats">Stats de Billy</page-btn>
 		`;
 
@@ -48,6 +58,40 @@ class DashboardPage extends CustomComponent {
 		// GLOIRE and RICHESSE
 		this.$glory.show([{ incr: incrStat('glory', 'GLOIRE'), value: user_data.glory }]);
 		this.$wealth.show([{ incr: incrStat('wealth', 'RICHESSE'), value: user_data.wealth }]);
+
+		// Add item
+		const addItem = attr => {
+			const item = prompt('Quel élément voulez-vous ajouter ?');
+			if (!item) return;
+
+			saveUserData(data => {
+				data[attr].push(item);
+				return data;
+			});
+			this.update();
+		};
+
+		// Remove item
+		const removeItem = (attr, item) => {
+			if (!confirm(`Voulez-vous supprimer "${item}" ?`)) return;
+			saveUserData(data => {
+				data[attr] = data[attr].filter(i => i !== item);
+				return data;
+			});
+			this.update();
+		};
+
+		// Collected objects
+		this.$collected_items.show([
+			...user_data.collected_items.map(item => ({ label: item, bullet: true, onSelect: () => removeItem('collected_items', item) })),
+			{ label: 'Ajouter un élément', gray: true, bullet: true, onSelect: () => addItem('collected_items') }
+		]);
+
+		// Adventure notes
+		this.$adventure_notes.show([
+			...user_data.adventure_notes.map(item => ({ label: item, bullet: true, onSelect: () => removeItem('adventure_notes', item) })),
+			{ label: 'Ajouter un élément', gray: true, bullet: true, onSelect: () => addItem('adventure_notes') }
+		]);
 	}
 }
 
