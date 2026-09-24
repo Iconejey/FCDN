@@ -47,21 +47,21 @@ function saveUserData(callback) {
 }
 
 // Get Billy info
-function getBillyInfo({ equipment }) {
+function getBillyInfo({ equipment, bonuses }) {
 	// Default information
 	const info = {
 		personality: 'DÉBROUILLARD',
 
-		hab: { title: 'HABILITÉ', base: 2, equip: 0, perso: 0, total: 0 },
-		adr: { title: 'ADRESSE', base: 1, equip: 0, perso: 0, total: 0, max: 5 },
-		end: { title: 'ENDURENCE', base: 2, equip: 0, perso: 0, total: 0 },
-		cha: { title: 'CHANCE', base: 3, equip: 0, perso: 0, total: 0 },
+		hab: { title: 'HABILITÉ', base: 2, equip: 0, perso: 0, bonus: bonuses.hab, total: 0 },
+		adr: { title: 'ADRESSE', base: 1, equip: 0, perso: 0, bonus: bonuses.adr, total: 0, max: 5 },
+		end: { title: 'ENDURENCE', base: 2, equip: 0, perso: 0, bonus: bonuses.end, total: 0 },
+		cha: { title: 'CHANCE', base: 3, equip: 0, perso: 0, bonus: bonuses.cha, total: 0 },
 
-		deg: { title: 'DÉGÂTS', base: 0, equip: 0, perso: 0, total: 0 },
-		arm: { title: 'ARMURE', base: 0, equip: 0, perso: 0, total: 0 },
-		crit: { title: 'CRITIQUE', base: 0, equip: 0, perso: 0, total: 0 },
+		deg: { title: 'DÉGÂTS', base: 0, equip: 0, perso: 0, bonus: bonuses.deg, total: 0 },
+		arm: { title: 'ARMURE', base: 0, equip: 0, perso: 0, bonus: bonuses.arm, total: 0 },
+		crit: { title: 'CRITIQUE', base: 0, equip: 0, perso: 0, bonus: bonuses.crit, total: 0 },
 
-		pv_max: { title: 'PV MAX', total: 0 },
+		pv_max: { title: 'PV MAX', base: 0, bonus: bonuses.pv_max, total: 0 },
 
 		notes: []
 	};
@@ -97,7 +97,7 @@ function getBillyInfo({ equipment }) {
 		stat.perso += personalities[info.personality][attr] || 0;
 
 		// Total
-		stat.total = stat.base + stat.equip + stat.perso;
+		stat.total = stat.base + stat.equip + stat.perso + stat.bonus;
 
 		// Max
 		if (stat.max && stat.total > stat.max) {

@@ -7,8 +7,6 @@ class DashboardPage extends CustomComponent {
 			<p>Ici, tu peux suivre ton avancée dans l'aventure.</p>
 			<page-btn page="stats">Stats de Billy</page-btn>
 		`;
-
-		const user_data = getUserData();
 	}
 }
 

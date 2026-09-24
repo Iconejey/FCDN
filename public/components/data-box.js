@@ -19,14 +19,16 @@ class DataBox extends CustomComponent {
 		this.$list.innerHTML = '';
 
 		for (const item of list) {
-			const $item = emmet`div.data-box-item${item.bullet ? '.bullet' : ''}`;
+			if (item === 'separator') {
+				this.$list.appendChild(emmet`div.data-box-separator`);
+			} else {
+				const $item = this.$list.appendChild(emmet`div.data-box-item${item.bullet ? '.bullet' : ''}${item.bold ? '.bold' : ''}`);
 
-			$item.innerHTML = html`
-				<li class="data-box-item-label">${item.label}</li>
-				<span class="data-box-item-value">${item.value}</span>
-			`;
-
-			this.$list.appendChild($item);
+				$item.innerHTML = html`
+					<li class="data-box-item-label">${item.label}</li>
+					<span class="data-box-item-value">${item.value}</span>
+				`;
+			}
 		}
 	}
 }
