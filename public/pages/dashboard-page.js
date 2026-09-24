@@ -42,18 +42,19 @@ class DashboardPage extends CustomComponent {
 		`;
 
 		// Increment stat
-		const incrStat = (attr, title) => d => {
+		const incrStat = (attr, title, max) => d => {
 			if (!confirm(`Voulez-vous ${d > 0 ? 'ajouter' : 'retirer'} 1 point de ${title} ?`)) return;
 			saveUserData(data => {
 				data[attr] += d;
+				if (max && data[attr] > max) return alert('Vous avez déjà atteint le maximum pour cette valeur.');
 				return data;
 			});
 			this.update();
 		};
 
 		// PV and CHANCE
-		this.$pv.show([{ incr: incrStat('pv', 'PV'), value: `${user_data.pv} / ${infos.pv_max.total}` }]);
-		this.$chance.show([{ incr: incrStat('chance', 'CHANCE'), value: `${user_data.chance} / ${infos.cha.total}` }]);
+		this.$pv.show([{ incr: incrStat('pv', 'PV', infos.pv_max.total), value: `${user_data.pv} / ${infos.pv_max.total}` }]);
+		this.$chance.show([{ incr: incrStat('chance', 'CHANCE', infos.cha.total), value: `${user_data.chance} / ${infos.cha.total}` }]);
 
 		// GLOIRE and RICHESSE
 		this.$glory.show([{ incr: incrStat('glory', 'GLOIRE'), value: user_data.glory }]);
