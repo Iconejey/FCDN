@@ -21,6 +21,17 @@ class DataBox extends CustomComponent {
 		for (const item of list) {
 			if (item === 'separator') {
 				this.$list.appendChild(emmet`div.data-box-separator`);
+			} else if (item.incr) {
+				const $item = this.$list.appendChild(emmet`div.data-box-item.counter`);
+
+				$item.innerHTML = html`
+					<span class="material-symbols-outlined counter-btn remove-btn">remove</span>
+					<span class="data-box-item-value">${item.value}</span>
+					<span class="material-symbols-outlined counter-btn add-btn">add</span>
+				`;
+
+				$item.$('.remove-btn').onclick = () => item.incr(-1);
+				$item.$('.add-btn').onclick = () => item.incr(1);
 			} else {
 				const $item = this.$list.appendChild(emmet`div.data-box-item${item.bullet ? '.bullet' : ''}${item.bold ? '.bold' : ''}`);
 

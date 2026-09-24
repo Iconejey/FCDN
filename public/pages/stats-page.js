@@ -30,7 +30,10 @@ class StatsPage extends CustomComponent {
 
 		// Increment stat
 		const incrStat = attr => d => {
-			user_data.bonuses[attr] += d;
+			saveUserData(data => {
+				data.bonuses[attr] += d;
+				return data;
+			});
 			this.update();
 		};
 

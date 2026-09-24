@@ -114,6 +114,22 @@ data-box {
 			& .data-box-item-value {
 				font-weight: bold;
 			}
+
+			&.counter {
+				margin: 0.5rem 0;
+				justify-content: center;
+				align-items: center;
+				gap: 2rem;
+
+				& .counter-btn {
+					cursor: pointer;
+					user-select: none;
+
+					&:hover {
+						opacity: 0.6;
+					}
+				}
+			}
 		}
 	}
 }
