@@ -53,8 +53,8 @@ function getUserData() {
 
 // Save user data
 function saveUserData(callback) {
-	const new_data = callback(getUserData()) || {};
-	localStorage.setItem('data', JSON.stringify(new_data));
+	const new_data = callback(getUserData());
+	if (new_data) localStorage.setItem('data', JSON.stringify(new_data));
 }
 
 // Get Billy info
