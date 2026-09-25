@@ -1,6 +1,8 @@
 class AdrPage extends CustomComponent {
 	static selectors = {
-		$adr_box: '#adr-box'
+		$adr_box: '#adr-box',
+		$dice: 'random-dice',
+		$status_msg: '#status-msg'
 	};
 
 	connectedCallback() {
@@ -15,10 +17,22 @@ class AdrPage extends CustomComponent {
 				<random-dice />
 			</div>
 
-			<page-btn page="action">Retour</page-btn>
+			<div id="status-msg" class="centering"></div>
+
+			<page-btn page="dashboard">Retour</page-btn>
 		`;
 
 		this.update();
+
+		this.$dice.onThrow = number => {
+			const { adr } = getBillyInfo(getUserData());
+			const success = number <= adr.total;
+			this.$status_msg.innerHTML = success ? html`<span style="color: #2e7d32; font-weight: bold; font-size: 1.5rem;">Réussite !</span>` : html`<span style="color: #c62828; font-weight: bold; font-size: 1.5rem;">Échec...</span>`;
+		};
+
+		this.$dice.addEventListener('click', () => {
+			this.$status_msg.innerHTML = '';
+		});
 	}
 
 	update() {
