@@ -15,6 +15,8 @@ class BattlePage extends CustomComponent {
 		$combat_adv: '#combat-adv-box',
 		$combat_situation: '#combat-situation',
 		$combat_instructions: '#combat-instructions',
+		$attack_dice: '#attack-dice',
+		$dodge_dice: '#dodge-dice',
 
 		$to_adversaire_btn: '#to-adversaire-btn',
 		$back_to_billy_btn: '#back-to-billy-btn',
@@ -118,8 +120,8 @@ class BattlePage extends CustomComponent {
 				<p id="combat-instructions" style="text-align: center; font-size: 1.1rem; margin: 15px 0;"></p>
 
 				<div class="centering">
-					<random-dice></random-dice>
-					<random-dice></random-dice>
+					<random-dice id="attack-dice"></random-dice>
+					<random-dice id="dodge-dice"></random-dice>
 				</div>
 
 				<div class="centering" style="margin: 20px 0;">
@@ -148,6 +150,8 @@ class BattlePage extends CustomComponent {
 			const user_data = getUserData();
 			this.billy_pvs = [user_data ? user_data.pv : 0];
 			this.adversaire_pvs = [this.adversaire.pv];
+			this.$attack_dice.number = 0;
+			this.$dodge_dice.number = 0;
 			this.update();
 		};
 
@@ -160,6 +164,14 @@ class BattlePage extends CustomComponent {
 			// Does nothing for now
 		};
 
+		this.$attack_dice.onThrow = () => {
+			this.updateContinueButton();
+		};
+
+		this.$dodge_dice.onThrow = () => {
+			this.updateContinueButton();
+		};
+
 		this.update();
 	}
 
@@ -167,6 +179,16 @@ class BattlePage extends CustomComponent {
 		this.billy_pvs.push(billy_pv);
 		this.adversaire_pvs.push(adv_pv);
 		this.update();
+	}
+
+	updateContinueButton() {
+		const infos = getBillyInfo(getUserData());
+		const has_dodge = infos.adr.total + this.battle_modifiers.adr >= 2;
+		const attack_rolled = this.$attack_dice.number > 0;
+		const dodge_rolled = this.$dodge_dice.number > 0;
+		const can_continue = has_dodge ? attack_rolled && dodge_rolled : attack_rolled;
+		if (can_continue) this.$continue_btn.removeAttribute('disabled');
+		else this.$continue_btn.setAttribute('disabled', '');
 	}
 
 	update() {
@@ -281,6 +303,11 @@ class BattlePage extends CustomComponent {
 				instructions_html += `<br><br>Vous avez un <b>Billy DEBROUILLARD</b>, donc vous pouvez relancer le dé d'attaque une fois.`;
 			}
 			this.$combat_instructions.innerHTML = instructions_html;
+
+			const has_dodge = infos.adr.total + this.battle_modifiers.adr >= 2;
+			this.$dodge_dice.disabled = !has_dodge;
+
+			this.updateContinueButton();
 		}
 	}
 }

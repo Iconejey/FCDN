@@ -21,10 +21,20 @@ class RandomDice extends CustomComponent {
 		this.number = 0;
 
 		this.onclick = async () => {
+			if (this.disabled) return;
 			if (this._throwing) return;
 			const res = await this.roll();
 			if (this.onThrow) this.onThrow(res);
 		};
+	}
+
+	get disabled() {
+		return this.hasAttribute('disabled');
+	}
+
+	set disabled(val) {
+		if (val) this.setAttribute('disabled', '');
+		else this.removeAttribute('disabled');
 	}
 
 	get number() {
