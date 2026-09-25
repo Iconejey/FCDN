@@ -36,6 +36,9 @@ class BattlePage extends CustomComponent {
 			deg: 0,
 			arm: 0
 		};
+		const user_data = getUserData();
+		this.billy_pvs = [user_data ? user_data.pv : 0];
+		this.adversaire_pvs = [this.adversaire.pv];
 
 		this.innerHTML = html`
 			<style>
@@ -103,13 +106,12 @@ class BattlePage extends CustomComponent {
 			<!-- COMBAT VIEW -->
 			<div id="combat-view" class="view-container">
 				<h1>Combat</h1>
+				<p id="combat-situation"></p>
 
 				<div class="v-split">
 					<data-box id="combat-billy-box"></data-box>
 					<data-box id="combat-adv-box"></data-box>
 				</div>
-
-				<p id="combat-situation"></p>
 
 				<div class="v-split">
 					<button id="back-to-adv-btn" class="btn">Retour</button>
@@ -130,6 +132,9 @@ class BattlePage extends CustomComponent {
 
 		this.$to_combat_btn.onclick = () => {
 			this.current_view = 'COMBAT';
+			const user_data = getUserData();
+			this.billy_pvs = [user_data ? user_data.pv : 0];
+			this.adversaire_pvs = [this.adversaire.pv];
 			this.update();
 		};
 
@@ -138,6 +143,12 @@ class BattlePage extends CustomComponent {
 			this.update();
 		};
 
+		this.update();
+	}
+
+	addPvPair(billy_pv, adv_pv) {
+		this.billy_pvs.push(billy_pv);
+		this.adversaire_pvs.push(adv_pv);
 		this.update();
 	}
 
@@ -190,6 +201,9 @@ class BattlePage extends CustomComponent {
 							const val = this.adversaire[stat] + d;
 							if (val < 0) return;
 							this.adversaire[stat] = val;
+							if (stat === 'pv') {
+								this.adversaire_pvs[0] = val;
+							}
 							this.update();
 						}
 					}
@@ -205,21 +219,27 @@ class BattlePage extends CustomComponent {
 		}
 
 		if (this.current_view === 'COMBAT') {
-			const billy_list = [
+			const billy_list = [];
+			this.billy_pvs.forEach(pv => {
+				billy_list.push({ label: 'PV', value: pv });
+			});
+			billy_list.push('separator');
+			billy_list.push(
 				{ label: 'Habileté', value: infos.hab.total + this.battle_modifiers.hab },
 				{ label: 'Adresse', value: infos.adr.total + this.battle_modifiers.adr },
 				{ label: 'Armure', value: infos.arm.total + this.battle_modifiers.arm },
 				{ label: 'Dégâts', value: infos.deg.total + this.battle_modifiers.deg },
 				{ label: 'Critique', value: infos.crit.total + this.battle_modifiers.crit }
-			];
+			);
 			this.$combat_billy.title = 'BILLY';
 			this.$combat_billy.show(billy_list);
 
-			const adv_list = [
-				{ label: 'Habileté', value: this.adversaire.hab },
-				{ label: 'Armure', value: this.adversaire.arm },
-				{ label: 'Dégâts', value: this.adversaire.deg }
-			];
+			const adv_list = [];
+			this.adversaire_pvs.forEach(pv => {
+				adv_list.push({ label: 'PV', value: pv });
+			});
+			adv_list.push('separator');
+			adv_list.push({ label: 'Habileté', value: this.adversaire.hab }, { label: 'Armure', value: this.adversaire.arm }, { label: 'Dégâts', value: this.adversaire.deg });
 			this.$combat_adv.title = 'ADVERSAIRE';
 			this.$combat_adv.show(adv_list);
 
