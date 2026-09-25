@@ -17,6 +17,8 @@ class BattlePage extends CustomComponent {
 		$combat_instructions: '#combat-instructions',
 		$attack_dice: '#attack-dice',
 		$dodge_dice: '#dodge-dice',
+		$summary_billy_box: '#summary-billy-box',
+		$summary_adv_box: '#summary-adv-box',
 
 		$to_adversaire_btn: '#to-adversaire-btn',
 		$back_to_billy_btn: '#back-to-billy-btn',
@@ -43,6 +45,8 @@ class BattlePage extends CustomComponent {
 		const user_data = getUserData();
 		this.billy_pvs = [user_data ? user_data.pv : 0];
 		this.adversaire_pvs = [this.adversaire.pv];
+		this.combat_phase = 'ROLL';
+		this.round_summary = null;
 
 		this.innerHTML = html`
 			<style>
@@ -124,8 +128,20 @@ class BattlePage extends CustomComponent {
 					<random-dice id="dodge-dice"></random-dice>
 				</div>
 
-				<div class="centering" style="margin: 20px 0;">
+				<div id="continue-btn-container" class="centering" style="margin: 20px 0;">
 					<button id="continue-btn" class="btn">Continuer</button>
+				</div>
+
+				<div id="combat-summary-area" class="hidden">
+					<div class="v-split">
+						<data-box id="summary-billy-box"></data-box>
+						<data-box id="summary-adv-box"></data-box>
+					</div>
+					<p id="summary-warning" style="text-align: center; color: red; font-weight: bold; margin: 10px 0;"></p>
+					<p id="summary-outcome" style="text-align: center; font-size: 1.3rem; font-weight: bold; margin: 15px 0;"></p>
+					<div class="centering" style="margin: 20px 0;">
+						<button id="next-turn-btn" class="btn">Tour suivant</button>
+					</div>
 				</div>
 
 				<div class="v-split">
@@ -147,6 +163,8 @@ class BattlePage extends CustomComponent {
 
 		this.$to_combat_btn.onclick = () => {
 			this.current_view = 'COMBAT';
+			this.combat_phase = 'ROLL';
+			this.round_summary = null;
 			const user_data = getUserData();
 			this.billy_pvs = [user_data ? user_data.pv : 0];
 			this.adversaire_pvs = [this.adversaire.pv];
@@ -161,7 +179,72 @@ class BattlePage extends CustomComponent {
 		};
 
 		this.$continue_btn.onclick = () => {
-			// Does nothing for now
+			const dice_val = this.$attack_dice.number;
+			const user_data = getUserData();
+			const infos = getBillyInfo(user_data);
+			const billy_hab_total = infos.hab.total + this.battle_modifiers.hab;
+			const hab_diff = billy_hab_total - this.adversaire.hab;
+			const [billy_atk_dmg, adv_atk_dmg] = getSituationDmg(hab_diff, dice_val);
+
+			// Billy's calculation
+			const billy_atk = adv_atk_dmg;
+			const billy_deg = this.adversaire.deg;
+			const billy_arm = infos.arm.total + this.battle_modifiers.arm;
+			let billy_total = Math.max(0, billy_atk + billy_deg - billy_arm);
+
+			const is_paysan = infos.personality === 'PAYSAN';
+			const paysan_triggered = is_paysan && billy_total > 3;
+			if (paysan_triggered) billy_total = 3;
+
+			// Adversary's calculation
+			const adv_atk = billy_atk_dmg;
+			const adv_deg = infos.deg.total + this.battle_modifiers.deg;
+			const adv_arm = this.adversaire.arm;
+			const adv_total = Math.max(0, adv_atk + adv_deg - adv_arm);
+
+			// Calculate new PV values
+			const current_billy_pv = this.billy_pvs[this.billy_pvs.length - 1];
+			const current_adv_pv = this.adversaire_pvs[this.adversaire_pvs.length - 1];
+
+			let new_billy_pv = Math.max(0, current_billy_pv - billy_total);
+			let new_adv_pv = Math.max(0, current_adv_pv - adv_total);
+
+			// Mutual death check: Billy wins, PV loss ignored
+			let mutual_death = false;
+			if (new_billy_pv === 0 && new_adv_pv === 0) {
+				mutual_death = true;
+				new_billy_pv = current_billy_pv;
+				billy_total = 0;
+			}
+
+			this.round_summary = {
+				billy: {
+					atk: billy_atk,
+					deg: billy_deg,
+					arm: billy_arm,
+					total: billy_total,
+					paysan_triggered
+				},
+				adv: {
+					atk: adv_atk,
+					deg: adv_deg,
+					arm: adv_arm,
+					total: adv_total
+				},
+				mutual_death,
+				new_billy_pv,
+				new_adv_pv
+			};
+
+			this.combat_phase = 'SUMMARY';
+			this.addPvPair(new_billy_pv, new_adv_pv);
+		};
+
+		this.querySelector('#next-turn-btn').onclick = () => {
+			this.combat_phase = 'ROLL';
+			this.$attack_dice.number = 0;
+			this.$dodge_dice.number = 0;
+			this.update();
 		};
 
 		this.$attack_dice.onThrow = () => {
@@ -295,7 +378,7 @@ class BattlePage extends CustomComponent {
 			else if (hab_diff >= 5) situation = 'AVANTAGE LOURD';
 
 			const hab_diff_str = hab_diff > 0 ? `+${hab_diff}` : `${hab_diff}`;
-			this.$combat_situation.innerHTML = `Vous ête en <b>${situation}</b> (${hab_diff_str}).`;
+			this.$combat_situation.innerHTML = `Vous êtes en <b>${situation}</b> (${hab_diff_str}).`;
 
 			const is_debrouillard = infos.personality === 'DÉBROUILLARD';
 			let instructions_html = `Cliquez sur le premier dé pour la <b>PHASE D'ATTAQUE</b> et sur le second pour la <b>PHASE D'ESQUIVE</b>.`;
@@ -307,7 +390,65 @@ class BattlePage extends CustomComponent {
 			const has_dodge = infos.adr.total + this.battle_modifiers.adr >= 2;
 			this.$dodge_dice.disabled = !has_dodge;
 
-			this.updateContinueButton();
+			const $continue_container = this.querySelector('#continue-btn-container');
+			const $summary = this.querySelector('#combat-summary-area');
+
+			if (this.combat_phase === 'ROLL') {
+				$continue_container.classList.remove('hidden');
+				$summary.classList.add('hidden');
+				this.updateContinueButton();
+			} else if (this.combat_phase === 'SUMMARY') {
+				$continue_container.classList.add('hidden');
+				$summary.classList.remove('hidden');
+
+				const summary_billy = [
+					{ label: 'ATTAQUE', value: this.round_summary.billy.atk },
+					{ label: 'DEGATS', value: this.round_summary.billy.deg },
+					{ label: 'ARMURE', value: this.round_summary.billy.arm },
+					{ label: 'CRIT.', value: 0 },
+					'separator',
+					{ label: 'TOTAL', value: `-${this.round_summary.billy.total} PV` }
+				];
+				this.$summary_billy_box.title = 'BILLY';
+				this.$summary_billy_box.show(summary_billy);
+
+				const summary_adv = [
+					{ label: 'ATTAQUE', value: this.round_summary.adv.atk },
+					{ label: 'DEGATS', value: this.round_summary.adv.deg },
+					{ label: 'ARMURE', value: this.round_summary.adv.arm },
+					{ label: 'CRIT.', value: 0 },
+					'separator',
+					{ label: 'TOTAL', value: `-${this.round_summary.adv.total} PV` }
+				];
+				this.$summary_adv_box.title = 'ADVERSAIRE';
+				this.$summary_adv_box.show(summary_adv);
+
+				const $warning = this.querySelector('#summary-warning');
+				if (this.round_summary.billy.paysan_triggered) {
+					$warning.innerHTML = `Le Billy <b>PAYSAN</b> ne peut perdre que 3 PV par tour.`;
+					$warning.classList.remove('hidden');
+				} else {
+					$warning.innerHTML = '';
+					$warning.classList.add('hidden');
+				}
+
+				const $outcome = this.querySelector('#summary-outcome');
+				const $next_btn = this.querySelector('#next-turn-btn');
+
+				if (this.round_summary.new_billy_pv === 0) {
+					$outcome.innerText = 'Vous êtes mort !';
+					$outcome.classList.remove('hidden');
+					$next_btn.classList.add('hidden');
+				} else if (this.round_summary.new_adv_pv === 0) {
+					$outcome.innerText = 'Vous avez gagné ce combat !';
+					$outcome.classList.remove('hidden');
+					$next_btn.classList.add('hidden');
+				} else {
+					$outcome.innerText = '';
+					$outcome.classList.add('hidden');
+					$next_btn.classList.remove('hidden');
+				}
+			}
 		}
 	}
 }
