@@ -42,8 +42,8 @@ class DataBox extends CustomComponent {
 				if (item.select) $item.classList.add('select');
 
 				$item.innerHTML = html`
-					<li class="data-box-item-label">${item.label || ''}</li>
-					<span class="data-box-item-value">${item.value || ''}</span>
+					<li class="data-box-item-label">${item.label ?? ''}</li>
+					<span class="data-box-item-value">${item.value ?? ''}</span>
 				`;
 
 				$item.oncontextmenu = e => {

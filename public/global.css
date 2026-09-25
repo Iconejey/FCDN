@@ -156,6 +156,9 @@ data-box {
 	user-select: none;
 	cursor: pointer;
 	text-align: center;
+	background-color: white;
+	font-size: 1rem;
+	font-family: 'Times New Roman', Times, serif;
 
 	&[disabled] {
 		opacity: 0.3;
