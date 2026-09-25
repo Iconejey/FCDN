@@ -14,11 +14,13 @@ class BattlePage extends CustomComponent {
 		$combat_billy: '#combat-billy-box',
 		$combat_adv: '#combat-adv-box',
 		$combat_situation: '#combat-situation',
+		$combat_instructions: '#combat-instructions',
 
 		$to_adversaire_btn: '#to-adversaire-btn',
 		$back_to_billy_btn: '#back-to-billy-btn',
 		$to_combat_btn: '#to-combat-btn',
-		$back_to_adv_btn: '#back-to-adv-btn'
+		$back_to_adv_btn: '#back-to-adv-btn',
+		$continue_btn: '#continue-btn'
 	};
 
 	connectedCallback() {
@@ -113,6 +115,17 @@ class BattlePage extends CustomComponent {
 					<data-box id="combat-adv-box"></data-box>
 				</div>
 
+				<p id="combat-instructions" style="text-align: center; font-size: 1.1rem; margin: 15px 0;"></p>
+
+				<div class="centering">
+					<random-dice></random-dice>
+					<random-dice></random-dice>
+				</div>
+
+				<div class="centering" style="margin: 20px 0;">
+					<button id="continue-btn" class="btn">Continuer</button>
+				</div>
+
 				<div class="v-split">
 					<button id="back-to-adv-btn" class="btn">Retour</button>
 					<page-btn page="dashboard">Quitter</page-btn>
@@ -141,6 +154,10 @@ class BattlePage extends CustomComponent {
 		this.$back_to_adv_btn.onclick = () => {
 			this.current_view = 'ADVERSAIRE';
 			this.update();
+		};
+
+		this.$continue_btn.onclick = () => {
+			// Does nothing for now
 		};
 
 		this.update();
@@ -257,6 +274,13 @@ class BattlePage extends CustomComponent {
 
 			const hab_diff_str = hab_diff > 0 ? `+${hab_diff}` : `${hab_diff}`;
 			this.$combat_situation.innerHTML = `Vous ête en <b>${situation}</b> (${hab_diff_str}).`;
+
+			const is_debrouillard = infos.personality === 'DÉBROUILLARD';
+			let instructions_html = `Cliquez sur le premier dé pour la <b>PHASE D'ATTAQUE</b> et sur le second pour la <b>PHASE D'ESQUIVE</b>.`;
+			if (is_debrouillard) {
+				instructions_html += `<br><br>Vous avez un <b>Billy DEBROUILLARD</b>, donc vous pouvez relancer le dé d'attaque une fois.`;
+			}
+			this.$combat_instructions.innerHTML = instructions_html;
 		}
 	}
 }
