@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const app = express();
-const port = 8032;
+const port = 8011;
 
 const nolib_frontend_path = path.join(path.dirname(require.resolve('nolib/package.json')), 'frontend');
 app.use('/nolib', express.static(nolib_frontend_path));
