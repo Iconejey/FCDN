@@ -62,7 +62,7 @@ class BattlePage extends CustomComponent {
 					& #combat-situation {
 						text-align: center;
 						font-size: 1.15rem;
-						margin: 15px 0;
+						margin: 1rem 0;
 					}
 				}
 			</style>
@@ -129,11 +129,11 @@ class BattlePage extends CustomComponent {
 				</div>
 
 				<div id="combat-summary-area" class="hidden">
+					<p id="summary-warning" style="text-align: center; font-weight: bold; margin: 10px 0;"></p>
 					<div class="v-split">
 						<data-box id="summary-billy-box"></data-box>
 						<data-box id="summary-adv-box"></data-box>
 					</div>
-					<p id="summary-warning" style="text-align: center; color: red; font-weight: bold; margin: 10px 0;"></p>
 					<p id="summary-outcome" style="text-align: center; font-size: 1.3rem; font-weight: bold; margin: 15px 0;"></p>
 					<div class="centering" style="margin: 20px 0;">
 						<button id="next-turn-btn" class="btn">Tour suivant</button>
@@ -218,21 +218,75 @@ class BattlePage extends CustomComponent {
 		const hab_diff = billy_hab_total - this.adversaire.hab;
 		const [billy_atk_dmg, adv_atk_dmg] = getSituationDmg(hab_diff, dice_val);
 
-		// Billy's calculation
+		const dodge_val = this.$dodge_dice.number;
+		const has_dodge = infos.adr.total + this.battle_modifiers.adr >= 2;
+		const is_dodge_crit = has_dodge && dodge_val === 1;
+		const is_normal_dodge = has_dodge && dodge_val > 1 && dodge_val <= infos.adr.total + this.battle_modifiers.adr;
+
+		// Billy's normal stats
 		const billy_atk = adv_atk_dmg;
 		const billy_deg = this.adversaire.deg;
 		const billy_arm = infos.arm.total + this.battle_modifiers.arm;
-		let billy_total = Math.max(0, billy_atk + billy_deg - billy_arm);
+		const billy_total_normal = Math.max(0, billy_atk + billy_deg - billy_arm);
 
-		const is_paysan = infos.personality === 'PAYSAN';
-		const paysan_triggered = is_paysan && billy_total > 3;
-		if (paysan_triggered) billy_total = 3;
-
-		// Adversary's calculation
+		// Adversary's normal stats
 		const adv_atk = billy_atk_dmg;
 		const adv_deg = infos.deg.total + this.battle_modifiers.deg;
 		const adv_arm = this.adversaire.arm;
-		const adv_total = Math.max(0, adv_atk + adv_deg - adv_arm);
+		const adv_total_normal = Math.max(0, adv_atk + adv_deg - adv_arm);
+
+		let billy_total = billy_total_normal;
+		let adv_total = adv_total_normal;
+
+		let summary_billy = [];
+		let summary_adv = [];
+		const is_crit_text = is_dodge_crit ? `<b>COUP CRITIQUE !</b> Tu ne subis aucun dégât, et l'enemi prend la MAX !` : '';
+
+		if (is_dodge_crit) {
+			billy_total = 0;
+			const [billy_max_dmg] = getSituationDmg(hab_diff, 6);
+			const crit_bonus = infos.crit.total + this.battle_modifiers.crit;
+			adv_total = billy_max_dmg + crit_bonus;
+
+			summary_billy = [
+				{ label: 'ATTAQUE', value: `<s>${billy_atk}</s>` },
+				{ label: 'DEGATS', value: `<s>${billy_deg}</s>` },
+				{ label: 'ARMURE', value: `<s>${billy_arm}</s>` },
+				{ label: 'CRIT.', value: `<s>0</s>` },
+				'separator',
+				{ label: 'TOTAL', value: `-0 PV` }
+			];
+
+			summary_adv = [
+				{ label: 'ATTAQUE', value: `<s>${adv_atk}</s> ${billy_max_dmg}` },
+				{ label: 'DEGATS', value: `<s>${adv_deg}</s>` },
+				{ label: 'ARMURE', value: `<s>${adv_arm}</s>` },
+				{ label: 'CRIT.', value: `+${crit_bonus}` },
+				'separator',
+				{ label: 'TOTAL', value: `-${adv_total} PV` }
+			];
+		} else if (is_normal_dodge) {
+			billy_total = 0;
+
+			summary_billy = [
+				{ label: 'ATTAQUE', value: `<s>${billy_atk}</s>` },
+				{ label: 'DEGATS', value: `<s>${billy_deg}</s>` },
+				{ label: 'ARMURE', value: `<s>${billy_arm}</s>` },
+				{ label: 'CRIT.', value: `<s>0</s>` },
+				'separator',
+				{ label: 'TOTAL', value: `-0 PV` }
+			];
+
+			summary_adv = [{ label: 'ATTAQUE', value: adv_atk }, { label: 'DEGATS', value: adv_deg }, { label: 'ARMURE', value: adv_arm }, { label: 'CRIT.', value: 0 }, 'separator', { label: 'TOTAL', value: `-${adv_total} PV` }];
+		} else {
+			const is_paysan = infos.personality === 'PAYSAN';
+			const paysan_triggered = is_paysan && billy_total > 3;
+			if (paysan_triggered) billy_total = 3;
+
+			summary_billy = [{ label: 'ATTAQUE', value: billy_atk }, { label: 'DEGATS', value: billy_deg }, { label: 'ARMURE', value: billy_arm }, { label: 'CRIT.', value: 0 }, 'separator', { label: 'TOTAL', value: `-${billy_total} PV` }];
+
+			summary_adv = [{ label: 'ATTAQUE', value: adv_atk }, { label: 'DEGATS', value: adv_deg }, { label: 'ARMURE', value: adv_arm }, { label: 'CRIT.', value: 0 }, 'separator', { label: 'TOTAL', value: `-${adv_total} PV` }];
+		}
 
 		// Calculate new PV values
 		const current_billy_pv = this.billy_pvs[this.billy_pvs.length - 1];
@@ -247,22 +301,29 @@ class BattlePage extends CustomComponent {
 			mutual_death = true;
 			new_billy_pv = current_billy_pv;
 			billy_total = 0;
+			// Update summary total
+			const total_item = summary_billy.find(item => item && item.label === 'TOTAL');
+			if (total_item) total_item.value = `-0 PV`;
+		}
+
+		const is_paysan = infos.personality === 'PAYSAN';
+		const paysan_triggered = !is_dodge_crit && !is_normal_dodge && is_paysan && billy_total_normal > 3;
+
+		let dodge_text = '';
+		if (is_dodge_crit) {
+			dodge_text = `<b>COUP CRITIQUE !</b> Tu ne subis aucun dégât, et l'enemi prend la MAX !`;
+		} else if (is_normal_dodge) {
+			dodge_text = `<b>ESQUIVE !</b> Tu ne subis aucun dégât.`;
 		}
 
 		this.round_summary = {
 			billy: {
-				atk: billy_atk,
-				deg: billy_deg,
-				arm: billy_arm,
-				total: billy_total,
 				paysan_triggered
 			},
-			adv: {
-				atk: adv_atk,
-				deg: adv_deg,
-				arm: adv_arm,
-				total: adv_total
-			},
+			summary_billy,
+			summary_adv,
+			is_crit_text,
+			dodge_text,
 			mutual_death,
 			new_billy_pv,
 			new_adv_pv
@@ -395,31 +456,23 @@ class BattlePage extends CustomComponent {
 			} else if (this.combat_phase === 'SUMMARY') {
 				$summary.classList.remove('hidden');
 
-				const summary_billy = [
-					{ label: 'ATTAQUE', value: this.round_summary.billy.atk },
-					{ label: 'DEGATS', value: this.round_summary.billy.deg },
-					{ label: 'ARMURE', value: this.round_summary.billy.arm },
-					{ label: 'CRIT.', value: 0 },
-					'separator',
-					{ label: 'TOTAL', value: `-${this.round_summary.billy.total} PV` }
-				];
 				this.$summary_billy_box.title = 'BILLY';
-				this.$summary_billy_box.show(summary_billy);
+				this.$summary_billy_box.show(this.round_summary.summary_billy);
 
-				const summary_adv = [
-					{ label: 'ATTAQUE', value: this.round_summary.adv.atk },
-					{ label: 'DEGATS', value: this.round_summary.adv.deg },
-					{ label: 'ARMURE', value: this.round_summary.adv.arm },
-					{ label: 'CRIT.', value: 0 },
-					'separator',
-					{ label: 'TOTAL', value: `-${this.round_summary.adv.total} PV` }
-				];
 				this.$summary_adv_box.title = 'ADVERSAIRE';
-				this.$summary_adv_box.show(summary_adv);
+				this.$summary_adv_box.show(this.round_summary.summary_adv);
 
 				const $warning = this.querySelector('#summary-warning');
+				let warnings_html = '';
+				if (this.round_summary.dodge_text) {
+					warnings_html += `<div>${this.round_summary.dodge_text}</div>`;
+				}
 				if (this.round_summary.billy.paysan_triggered) {
-					$warning.innerHTML = `Le Billy <b>PAYSAN</b> ne peut perdre que 3 PV par tour.`;
+					warnings_html += `<div>Le Billy <b>PAYSAN</b> ne peut perdre que 3 PV par tour.</div>`;
+				}
+
+				if (warnings_html) {
+					$warning.innerHTML = warnings_html;
 					$warning.classList.remove('hidden');
 				} else {
 					$warning.innerHTML = '';
