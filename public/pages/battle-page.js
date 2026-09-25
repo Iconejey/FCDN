@@ -13,6 +13,7 @@ class BattlePage extends CustomComponent {
 
 		$combat_billy: '#combat-billy-box',
 		$combat_adv: '#combat-adv-box',
+		$combat_situation: '#combat-situation',
 
 		$to_adversaire_btn: '#to-adversaire-btn',
 		$back_to_billy_btn: '#back-to-billy-btn',
@@ -43,6 +44,14 @@ class BattlePage extends CustomComponent {
 
 					&.active {
 						display: block;
+					}
+				}
+
+				#combat-view {
+					& #combat-situation {
+						text-align: center;
+						font-size: 1.15rem;
+						margin: 15px 0;
 					}
 				}
 			</style>
@@ -99,6 +108,8 @@ class BattlePage extends CustomComponent {
 					<data-box id="combat-billy-box"></data-box>
 					<data-box id="combat-adv-box"></data-box>
 				</div>
+
+				<p id="combat-situation"></p>
 
 				<div class="v-split">
 					<button id="back-to-adv-btn" class="btn">Retour</button>
@@ -194,24 +205,7 @@ class BattlePage extends CustomComponent {
 		}
 
 		if (this.current_view === 'COMBAT') {
-			const pv_max = infos.pv_max.total;
-
 			const billy_list = [
-				{
-					label: 'PV',
-					value: `${user_data.pv} / ${pv_max}`,
-					incr: d => {
-						let val = user_data.pv + d;
-						if (val < 0) val = 0;
-						if (val > pv_max) val = pv_max;
-						saveUserData(data => {
-							data.pv = val;
-							return data;
-						});
-						this.update();
-					}
-				},
-				'separator',
 				{ label: 'Habileté', value: infos.hab.total + this.battle_modifiers.hab },
 				{ label: 'Adresse', value: infos.adr.total + this.battle_modifiers.adr },
 				{ label: 'Armure', value: infos.arm.total + this.battle_modifiers.arm },
@@ -222,23 +216,27 @@ class BattlePage extends CustomComponent {
 			this.$combat_billy.show(billy_list);
 
 			const adv_list = [
-				{
-					label: 'PV',
-					value: this.adversaire.pv,
-					incr: d => {
-						let val = this.adversaire.pv + d;
-						if (val < 0) val = 0;
-						this.adversaire.pv = val;
-						this.update();
-					}
-				},
-				'separator',
 				{ label: 'Habileté', value: this.adversaire.hab },
 				{ label: 'Armure', value: this.adversaire.arm },
 				{ label: 'Dégâts', value: this.adversaire.deg }
 			];
 			this.$combat_adv.title = 'ADVERSAIRE';
 			this.$combat_adv.show(adv_list);
+
+			const billy_hab_total = infos.hab.total + this.battle_modifiers.hab;
+			const hab_diff = billy_hab_total - this.adversaire.hab;
+
+			let situation = '';
+			if (hab_diff <= -5) situation = 'DÉSAVANTAGE LOURD';
+			else if (hab_diff === -4 || hab_diff === -3) situation = 'DÉSAVANTAGE';
+			else if (hab_diff === -2 || hab_diff === -1) situation = 'DÉSAVANTAGE LÉGER';
+			else if (hab_diff === 0) situation = 'ÉGALITÉ';
+			else if (hab_diff === 1 || hab_diff === 2) situation = 'AVANTAGE LÉGER';
+			else if (hab_diff === 3 || hab_diff === 4) situation = 'AVANTAGE';
+			else if (hab_diff >= 5) situation = 'AVANTAGE LOURD';
+
+			const hab_diff_str = hab_diff > 0 ? `+${hab_diff}` : `${hab_diff}`;
+			this.$combat_situation.innerHTML = `Vous ête en <b>${situation}</b> (${hab_diff_str}).`;
 		}
 	}
 }
