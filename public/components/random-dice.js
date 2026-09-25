@@ -18,7 +18,7 @@ class RandomDice extends CustomComponent {
 		}
 
 		// Initial face
-		this.number = Math.floor(Math.random() * 6) + 1;
+		this.number = 0;
 
 		this.onclick = async () => {
 			if (this._throwing) return;
