@@ -5,8 +5,8 @@
 }
 
 body {
-	padding: 3rem 2rem;
-	font-size: 18px;
+	padding: 3rem 1rem;
+	font-size: 16px;
 }
 
 img {
@@ -124,9 +124,9 @@ data-box {
 			}
 
 			&.counter {
-				justify-content: center;
+				justify-content: space-between;
 				align-items: center;
-				gap: 2rem;
+				padding: 0 1rem;
 
 				& .counter-btn {
 					cursor: pointer;
