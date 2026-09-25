@@ -111,7 +111,7 @@ data-box {
 				margin-left: 1rem;
 			}
 
-			&.gray .data-box-item-label {
+			&.gray {
 				opacity: 0.5;
 			}
 

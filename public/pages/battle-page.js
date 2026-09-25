@@ -408,8 +408,12 @@ class BattlePage extends CustomComponent {
 
 		if (this.current_view === 'COMBAT') {
 			const billy_list = [];
-			this.billy_pvs.forEach(pv => {
-				billy_list.push({ label: 'PV', value: pv });
+			this.billy_pvs.forEach((pv, index) => {
+				billy_list.push({
+					label: 'PV',
+					value: pv,
+					gray: index < this.billy_pvs.length - 1
+				});
 			});
 			billy_list.push('separator');
 			billy_list.push(
@@ -423,8 +427,12 @@ class BattlePage extends CustomComponent {
 			this.$combat_billy.show(billy_list);
 
 			const adv_list = [];
-			this.adversaire_pvs.forEach(pv => {
-				adv_list.push({ label: 'PV', value: pv });
+			this.adversaire_pvs.forEach((pv, index) => {
+				adv_list.push({
+					label: 'PV',
+					value: pv,
+					gray: index < this.adversaire_pvs.length - 1
+				});
 			});
 			adv_list.push('separator');
 			adv_list.push({ label: 'Habileté', value: this.adversaire.hab }, { label: 'Armure', value: this.adversaire.arm }, { label: 'Dégâts', value: this.adversaire.deg });
