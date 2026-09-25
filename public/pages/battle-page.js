@@ -212,7 +212,7 @@ class BattlePage extends CustomComponent {
 					}
 				},
 				'separator',
-				{ label: 'Habilité', value: infos.hab.total + this.battle_modifiers.hab },
+				{ label: 'Habileté', value: infos.hab.total + this.battle_modifiers.hab },
 				{ label: 'Adresse', value: infos.adr.total + this.battle_modifiers.adr },
 				{ label: 'Armure', value: infos.arm.total + this.battle_modifiers.arm },
 				{ label: 'Dégâts', value: infos.deg.total + this.battle_modifiers.deg },
@@ -233,7 +233,7 @@ class BattlePage extends CustomComponent {
 					}
 				},
 				'separator',
-				{ label: 'Habilité', value: this.adversaire.hab },
+				{ label: 'Habileté', value: this.adversaire.hab },
 				{ label: 'Armure', value: this.adversaire.arm },
 				{ label: 'Dégâts', value: this.adversaire.deg }
 			];

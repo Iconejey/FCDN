@@ -65,7 +65,7 @@ function getBillyInfo({ equipment, bonuses }) {
 	const info = {
 		personality: 'DÉBROUILLARD',
 
-		hab: { title: 'HABILITÉ', base: 2, equip: 0, perso: 0, bonus: bonuses.hab, total: 0 },
+		hab: { title: 'HABILETÉ', base: 2, equip: 0, perso: 0, bonus: bonuses.hab, total: 0 },
 		adr: { title: 'ADRESSE', base: 1, equip: 0, perso: 0, bonus: bonuses.adr, total: 0, max: 5 },
 		end: { title: 'ENDURENCE', base: 2, equip: 0, perso: 0, bonus: bonuses.end, total: 0 },
 		cha: { title: 'CHANCE MAX', base: 3, equip: 0, perso: 0, bonus: bonuses.cha, total: 0 },
@@ -93,7 +93,7 @@ function getBillyInfo({ equipment, bonuses }) {
 
 	// No HAB for the dagger if user chose the bow or two weapons
 	if (equipment.includes('LA DAGUE') && (equipment.includes('LA DAGUE') || equip_type_counts.ARME >= 2)) {
-		info.notes.push("LA DAGUE ne vous apporte pas d'HABILITÉ si vous avez L'ARC ou deux ARMES.");
+		info.notes.push("LA DAGUE ne vous apporte pas d'HABILETÉ si vous avez L'ARC ou deux ARMES.");
 		info.hab.equip -= 1;
 	}
 
