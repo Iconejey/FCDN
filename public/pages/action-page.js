@@ -1,8 +1,4 @@
 class ActionPage extends CustomComponent {
-	static selectors = {
-		$chance_btn: '#chance-btn'
-	};
-
 	connectedCallback() {
 		this.innerHTML = html`
 			<h1>Action</h1>
