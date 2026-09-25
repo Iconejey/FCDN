@@ -129,11 +129,11 @@ class BattlePage extends CustomComponent {
 				</div>
 
 				<div id="combat-summary-area" class="hidden">
-					<p id="summary-warning" style="text-align: center; font-weight: bold; margin: 10px 0;"></p>
 					<div class="v-split">
 						<data-box id="summary-billy-box"></data-box>
 						<data-box id="summary-adv-box"></data-box>
 					</div>
+					<p id="summary-warning" style="text-align: center; font-weight: bold; margin: 10px 0;"></p>
 					<p id="summary-outcome" style="text-align: center; font-size: 1.3rem; font-weight: bold; margin: 15px 0;"></p>
 					<div class="centering" style="margin: 20px 0;">
 						<button id="next-turn-btn" class="btn">Tour suivant</button>
@@ -331,6 +331,13 @@ class BattlePage extends CustomComponent {
 
 		this.combat_phase = 'SUMMARY';
 		this.addPvPair(new_billy_pv, new_adv_pv);
+
+		if (new_billy_pv === 0 || new_adv_pv === 0) {
+			saveUserData(data => {
+				data.pv = new_billy_pv;
+				return data;
+			});
+		}
 	}
 
 	update() {
