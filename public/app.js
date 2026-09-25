@@ -7,7 +7,7 @@ function openPage(page_name) {
 // Run the initial check on load
 window.addEventListener('DOMContentLoaded', () => {
 	// openPage(getUserData() ? 'dashboard' : 'welcome');
-	openPage(getUserData() ? 'adr' : 'welcome');
+	openPage(getUserData() ? 'chance' : 'welcome');
 });
 
 const equipment_options = [
