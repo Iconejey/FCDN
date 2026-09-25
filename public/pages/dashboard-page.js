@@ -39,7 +39,10 @@ class DashboardPage extends CustomComponent {
 				<data-box id="adventure-notes" title="NOTES D'AVENTURE" />
 			</div>
 
-			<page-btn page="stats">Stats de Billy</page-btn>
+			<div class="v-split">
+				<page-btn page="stats">Stats de Billy</page-btn>
+				<page-btn page="action">Action</page-btn>
+			</div>
 
 			<h1>Suivi des chapitres</h1>
 			<div id="chap-list" class="chap-list"></div>
