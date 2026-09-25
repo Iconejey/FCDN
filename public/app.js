@@ -28,7 +28,7 @@ const equipment_options = [
 ];
 
 const personalities = {
-	GUERRIER: { hab: 2, cha: -1, description: 'Vous infligez +1 DÉGÂTS à toutes vos attaques. Baston !' },
+	GUERRIER: { hab: 2, deg: 1, cha: -1, description: 'Vous infligez +1 DÉGÂTS à toutes vos attaques. Baston !' },
 	PRUDENT: { cha: 2, hab: -1, description: 'Vous pouvez utiliser votre CHANCE lors des combats (Pas encore implémenté).' },
 	PAYSAN: { end: 2, adr: -1, description: "Peu importe les DÉGATS que vous prenez lors d'une attaque, vous ne perdez pas plus de 3 PV." },
 	DÉBROUILLARD: { adr: 2, end: -1, description: "Vous pouvez relancer le dé une fois lors de la phase d'attaque pour espérer faire mieux." }
