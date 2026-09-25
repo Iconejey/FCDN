@@ -41,7 +41,8 @@ const default_user_data = {
 	wealth: 0,
 	bonuses: { hab: 0, adr: 0, end: 0, cha: 0, deg: 0, arm: 0, crit: 0, pv_max: 0 },
 	collected_items: [],
-	adventure_notes: []
+	adventure_notes: [],
+	chap_history: []
 };
 
 // Get user data

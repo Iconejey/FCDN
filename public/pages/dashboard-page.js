@@ -5,7 +5,8 @@ class DashboardPage extends CustomComponent {
 		$glory: '#glory',
 		$wealth: '#wealth',
 		$collected_items: '#collected-items',
-		$adventure_notes: '#adventure-notes'
+		$adventure_notes: '#adventure-notes',
+		$chap_list: '#chap-list'
 	};
 
 	connectedCallback() {
@@ -39,6 +40,9 @@ class DashboardPage extends CustomComponent {
 			</div>
 
 			<page-btn page="stats">Stats de Billy</page-btn>
+
+			<h1>Suivi des chapitres</h1>
+			<div id="chap-list" class="chap-list"></div>
 		`;
 
 		// Increment stat
@@ -93,6 +97,61 @@ class DashboardPage extends CustomComponent {
 			...user_data.adventure_notes.map(item => ({ label: item, bullet: true, onSelect: () => removeItem('adventure_notes', item) })),
 			{ label: 'Ajouter un élément', gray: true, bullet: true, onSelect: () => addItem('adventure_notes') }
 		]);
+
+		// Render chapter list
+		const chap_history = user_data.chap_history || [];
+		const chap_list_el = this.$chap_list;
+		chap_list_el.innerHTML = '';
+
+		const current_chap = chap_history[0];
+		const former_chaps = chap_history.slice(1);
+
+		const current_span = document.createElement('span');
+		current_span.className = 'current-chap';
+		current_span.textContent = current_chap !== undefined ? current_chap : '-';
+
+		current_span.oncontextmenu = event => {
+			event.preventDefault();
+			event.stopPropagation();
+			const user_input = prompt('Saisir le nouveau chapitre :');
+			if (!user_input) return;
+			const new_chap = Number(user_input);
+			if (isNaN(new_chap)) return alert('Veuillez entrer un numéro de chapitre valide.');
+			saveUserData(data => {
+				data.chap_history = [new_chap, ...(data.chap_history || [])];
+				return data;
+			});
+			this.update();
+		};
+
+		chap_list_el.appendChild(current_span);
+
+		if (former_chaps.length > 0) {
+			const former_container = document.createElement('div');
+			former_container.className = 'former-chaps';
+
+			former_chaps.forEach(chap => {
+				const chap_span = document.createElement('span');
+				chap_span.className = 'former-chap';
+				chap_span.textContent = chap;
+
+				chap_span.oncontextmenu = event => {
+					event.preventDefault();
+					event.stopPropagation();
+					if (confirm(`Voulez-vous revenir au chapitre ${chap} ?`)) {
+						saveUserData(data => {
+							data.chap_history = [chap, ...(data.chap_history || [])];
+							return data;
+						});
+						this.update();
+					}
+				};
+
+				former_container.appendChild(chap_span);
+			});
+
+			chap_list_el.appendChild(former_container);
+		}
 	}
 }
 
