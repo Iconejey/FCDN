@@ -128,10 +128,6 @@ class BattlePage extends CustomComponent {
 					<random-dice id="dodge-dice"></random-dice>
 				</div>
 
-				<div id="continue-btn-container" class="centering" style="margin: 20px 0;">
-					<button id="continue-btn" class="btn">Continuer</button>
-				</div>
-
 				<div id="combat-summary-area" class="hidden">
 					<div class="v-split">
 						<data-box id="summary-billy-box"></data-box>
@@ -178,68 +174,6 @@ class BattlePage extends CustomComponent {
 			this.update();
 		};
 
-		this.$continue_btn.onclick = () => {
-			const dice_val = this.$attack_dice.number;
-			const user_data = getUserData();
-			const infos = getBillyInfo(user_data);
-			const billy_hab_total = infos.hab.total + this.battle_modifiers.hab;
-			const hab_diff = billy_hab_total - this.adversaire.hab;
-			const [billy_atk_dmg, adv_atk_dmg] = getSituationDmg(hab_diff, dice_val);
-
-			// Billy's calculation
-			const billy_atk = adv_atk_dmg;
-			const billy_deg = this.adversaire.deg;
-			const billy_arm = infos.arm.total + this.battle_modifiers.arm;
-			let billy_total = Math.max(0, billy_atk + billy_deg - billy_arm);
-
-			const is_paysan = infos.personality === 'PAYSAN';
-			const paysan_triggered = is_paysan && billy_total > 3;
-			if (paysan_triggered) billy_total = 3;
-
-			// Adversary's calculation
-			const adv_atk = billy_atk_dmg;
-			const adv_deg = infos.deg.total + this.battle_modifiers.deg;
-			const adv_arm = this.adversaire.arm;
-			const adv_total = Math.max(0, adv_atk + adv_deg - adv_arm);
-
-			// Calculate new PV values
-			const current_billy_pv = this.billy_pvs[this.billy_pvs.length - 1];
-			const current_adv_pv = this.adversaire_pvs[this.adversaire_pvs.length - 1];
-
-			let new_billy_pv = Math.max(0, current_billy_pv - billy_total);
-			let new_adv_pv = Math.max(0, current_adv_pv - adv_total);
-
-			// Mutual death check: Billy wins, PV loss ignored
-			let mutual_death = false;
-			if (new_billy_pv === 0 && new_adv_pv === 0) {
-				mutual_death = true;
-				new_billy_pv = current_billy_pv;
-				billy_total = 0;
-			}
-
-			this.round_summary = {
-				billy: {
-					atk: billy_atk,
-					deg: billy_deg,
-					arm: billy_arm,
-					total: billy_total,
-					paysan_triggered
-				},
-				adv: {
-					atk: adv_atk,
-					deg: adv_deg,
-					arm: adv_arm,
-					total: adv_total
-				},
-				mutual_death,
-				new_billy_pv,
-				new_adv_pv
-			};
-
-			this.combat_phase = 'SUMMARY';
-			this.addPvPair(new_billy_pv, new_adv_pv);
-		};
-
 		this.querySelector('#next-turn-btn').onclick = () => {
 			this.combat_phase = 'ROLL';
 			this.$attack_dice.number = 0;
@@ -247,12 +181,24 @@ class BattlePage extends CustomComponent {
 			this.update();
 		};
 
+		const checkAndTrigger = () => {
+			const current_user_data = getUserData();
+			const current_infos = getBillyInfo(current_user_data);
+			const has_dodge = current_infos.adr.total + this.battle_modifiers.adr >= 2;
+			const attack_rolled = this.$attack_dice.number > 0;
+			const dodge_rolled = this.$dodge_dice.number > 0;
+			const can_continue = has_dodge ? attack_rolled && dodge_rolled : attack_rolled;
+			if (can_continue) {
+				this.executeCombatRound();
+			}
+		};
+
 		this.$attack_dice.onThrow = () => {
-			this.updateContinueButton();
+			checkAndTrigger();
 		};
 
 		this.$dodge_dice.onThrow = () => {
-			this.updateContinueButton();
+			checkAndTrigger();
 		};
 
 		this.update();
@@ -264,14 +210,66 @@ class BattlePage extends CustomComponent {
 		this.update();
 	}
 
-	updateContinueButton() {
-		const infos = getBillyInfo(getUserData());
-		const has_dodge = infos.adr.total + this.battle_modifiers.adr >= 2;
-		const attack_rolled = this.$attack_dice.number > 0;
-		const dodge_rolled = this.$dodge_dice.number > 0;
-		const can_continue = has_dodge ? attack_rolled && dodge_rolled : attack_rolled;
-		if (can_continue) this.$continue_btn.removeAttribute('disabled');
-		else this.$continue_btn.setAttribute('disabled', '');
+	executeCombatRound() {
+		const dice_val = this.$attack_dice.number;
+		const user_data = getUserData();
+		const infos = getBillyInfo(user_data);
+		const billy_hab_total = infos.hab.total + this.battle_modifiers.hab;
+		const hab_diff = billy_hab_total - this.adversaire.hab;
+		const [billy_atk_dmg, adv_atk_dmg] = getSituationDmg(hab_diff, dice_val);
+
+		// Billy's calculation
+		const billy_atk = adv_atk_dmg;
+		const billy_deg = this.adversaire.deg;
+		const billy_arm = infos.arm.total + this.battle_modifiers.arm;
+		let billy_total = Math.max(0, billy_atk + billy_deg - billy_arm);
+
+		const is_paysan = infos.personality === 'PAYSAN';
+		const paysan_triggered = is_paysan && billy_total > 3;
+		if (paysan_triggered) billy_total = 3;
+
+		// Adversary's calculation
+		const adv_atk = billy_atk_dmg;
+		const adv_deg = infos.deg.total + this.battle_modifiers.deg;
+		const adv_arm = this.adversaire.arm;
+		const adv_total = Math.max(0, adv_atk + adv_deg - adv_arm);
+
+		// Calculate new PV values
+		const current_billy_pv = this.billy_pvs[this.billy_pvs.length - 1];
+		const current_adv_pv = this.adversaire_pvs[this.adversaire_pvs.length - 1];
+
+		let new_billy_pv = Math.max(0, current_billy_pv - billy_total);
+		let new_adv_pv = Math.max(0, current_adv_pv - adv_total);
+
+		// Mutual death check: Billy wins, PV loss ignored
+		let mutual_death = false;
+		if (new_billy_pv === 0 && new_adv_pv === 0) {
+			mutual_death = true;
+			new_billy_pv = current_billy_pv;
+			billy_total = 0;
+		}
+
+		this.round_summary = {
+			billy: {
+				atk: billy_atk,
+				deg: billy_deg,
+				arm: billy_arm,
+				total: billy_total,
+				paysan_triggered
+			},
+			adv: {
+				atk: adv_atk,
+				deg: adv_deg,
+				arm: adv_arm,
+				total: adv_total
+			},
+			mutual_death,
+			new_billy_pv,
+			new_adv_pv
+		};
+
+		this.combat_phase = 'SUMMARY';
+		this.addPvPair(new_billy_pv, new_adv_pv);
 	}
 
 	update() {
@@ -390,15 +388,11 @@ class BattlePage extends CustomComponent {
 			const has_dodge = infos.adr.total + this.battle_modifiers.adr >= 2;
 			this.$dodge_dice.disabled = !has_dodge;
 
-			const $continue_container = this.querySelector('#continue-btn-container');
 			const $summary = this.querySelector('#combat-summary-area');
 
 			if (this.combat_phase === 'ROLL') {
-				$continue_container.classList.remove('hidden');
 				$summary.classList.add('hidden');
-				this.updateContinueButton();
 			} else if (this.combat_phase === 'SUMMARY') {
-				$continue_container.classList.add('hidden');
 				$summary.classList.remove('hidden');
 
 				const summary_billy = [
