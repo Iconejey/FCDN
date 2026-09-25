@@ -10,6 +10,11 @@ class AdrPage extends CustomComponent {
 			<div class="v-split">
 				<data-box id="adr-box"></data-box>
 			</div>
+
+			<div class="centering">
+				<random-dice />
+			</div>
+
 			<page-btn page="action">Retour</page-btn>
 		`;
 
