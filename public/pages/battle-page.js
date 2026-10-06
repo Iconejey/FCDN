@@ -117,6 +117,10 @@ class BattlePage extends CustomComponent {
 					<data-box id="adv-arm-box"></data-box>
 				</div>
 
+				<div class="centering" style="margin: 1.5rem 0;">
+					<random-dice></random-dice>
+				</div>
+
 				<div class="v-split">
 					<button class="leave-btn btn red">Quitter</button>
 				</div>
