@@ -468,8 +468,12 @@ class BattlePage extends CustomComponent {
 
 			if (this.combat_phase === 'ROLL') {
 				$summary.classList.add('hidden');
+				this.$attack_dice.disabled = false;
+				this.$dodge_dice.disabled = !has_dodge;
 			} else if (this.combat_phase === 'SUMMARY') {
 				$summary.classList.remove('hidden');
+				this.$attack_dice.disabled = true;
+				this.$dodge_dice.disabled = true;
 
 				this.$summary_billy_box.title = 'BILLY';
 				this.$summary_billy_box.show(this.round_summary.summary_billy);
