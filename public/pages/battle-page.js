@@ -501,11 +501,14 @@ class BattlePage extends CustomComponent {
 				const $outcome = this.querySelector('#summary-outcome');
 				const $next_btn = this.querySelector('#next-turn-btn');
 
-				if (this.round_summary.new_billy_pv === 0) {
+				const billy_pv = this.billy_pvs[this.billy_pvs.length - 1];
+				const adv_pv = this.adversaire_pvs[this.adversaire_pvs.length - 1];
+
+				if (billy_pv === 0) {
 					$outcome.innerText = 'Vous êtes mort !';
 					$outcome.classList.remove('hidden');
 					$next_btn.classList.add('hidden');
-				} else if (this.round_summary.new_adv_pv === 0) {
+				} else if (adv_pv === 0) {
 					$outcome.innerText = 'Vous avez gagné ce combat !';
 					$outcome.classList.remove('hidden');
 					$next_btn.classList.add('hidden');
