@@ -69,7 +69,7 @@ class BattlePage extends CustomComponent {
 						font-weight: bold;
 						opacity: 0.5;
 						cursor: pointer;
-						font-size: 1.5rem;
+						font-size: 1.2rem;
 
 						&.active {
 							opacity: 1;
