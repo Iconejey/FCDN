@@ -18,42 +18,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 	openPage('books');
 });
 
-const equipment_options = [
-	{ type: 'ARME', label: "L'ÉPEE", hab: 4 },
-	{ type: 'ARME', label: 'LA LANCE', hab: 3, adr: 1 },
-	{ type: 'ARME', label: 'LA MORGENSTERN', hab: 1, end: 1, deg: 1 },
-	{ type: 'ARME', label: "L'ARC", hab: 3, adr: 1, crit: 4 },
-
-	{ type: 'ÉQUIPEMENT', label: 'LA COTTE DE MAILLE', hab: -1, adr: -1, end: 1, arm: 2 },
-	{ type: 'ÉQUIPEMENT', label: 'LA MARMITE', end: 2, arm: 1 },
-	{ type: 'ÉQUIPEMENT', label: 'LE PAMPHLET TOURISTIQUE', cha: 4 },
-	{ type: 'ÉQUIPEMENT', label: 'LE KIT DE SOIN', cha: 1 },
-
-	{ type: 'OUTIL', label: 'LA FOURCHE', hab: 1, end: 3 },
-	{ type: 'OUTIL', label: 'LA DAGUE', hab: 1, crit: 6 },
-	{ type: 'OUTIL', label: "LE KIT D'ESCALADE", adr: 1 },
-	{ type: 'OUTIL', label: 'LE SAC DE GRAINS', end: 2, cha: 2 }
-];
-
-const personalities = {
-	GUERRIER: { hab: 2, deg: 1, cha: -1, description: 'Vous infligez <b>+1 DÉGÂTS</b> à toutes vos attaques. Baston !' },
-	PRUDENT: { cha: 2, hab: -1, description: 'Vous pouvez utiliser votre <b>CHANCE</b> lors des combats (Pas encore implémenté).' },
-	PAYSAN: { end: 2, adr: -1, description: "Peu importe les <b>DÉGATS</b> que vous prenez lors d'une attaque, vous ne perdez pas plus de <b>3 PV</b>." },
-	DÉBROUILLARD: { adr: 2, end: -1, description: "Vous pouvez relancer le dé une fois lors de la phase d'attaque pour espérer faire mieux." }
-};
-
-const default_user_data = {
-	equipment: [],
-	pv: 0,
-	chance: 0,
-	glory: 0,
-	wealth: 0,
-	bonuses: { hab: 0, adr: 0, end: 0, cha: 0, deg: 0, arm: 0, crit: 0, pv_max: 0 },
-	collected_items: [],
-	adventure_notes: [],
-	chap_history: []
-};
-
 // Get user data
 function getUserData() {
 	const string_data = localStorage.getItem('data');
@@ -85,90 +49,74 @@ function saveUserData(callback) {
 }
 
 // Get Billy info
-function getBillyInfo({ equipment, bonuses }) {
-	// Default information
-	const info = {
-		personality: 'DÉBROUILLARD',
+function getBillyInfo(user_data = {}) {
+	const equipment = user_data?.equipment || [];
+	const bonuses = user_data?.bonuses || {};
+	const book_constants = window.CONSTANTS?.[current_book];
+	if (!book_constants) return null;
 
-		hab: { title: 'HABILETÉ', base: 2, equip: 0, perso: 0, bonus: bonuses.hab, total: 0 },
-		adr: { title: 'ADRESSE', base: 1, equip: 0, perso: 0, bonus: bonuses.adr, total: 0, max: 5 },
-		end: { title: 'ENDURENCE', base: 2, equip: 0, perso: 0, bonus: bonuses.end, total: 0 },
-		cha: { title: 'CHANCE MAX', base: 3, equip: 0, perso: 0, bonus: bonuses.cha, total: 0 },
+	const info = JSON.parse(JSON.stringify(book_constants.default_info));
 
-		deg: { title: 'DÉGÂTS', base: 0, equip: 0, perso: 0, bonus: bonuses.deg, total: 0 },
-		arm: { title: 'ARMURE', base: 0, equip: 0, perso: 0, bonus: bonuses.arm, total: 0 },
-		crit: { title: 'CRITIQUE', base: 0, equip: 0, perso: 0, bonus: bonuses.crit, total: 0 },
+	for (const key of Object.keys(info)) {
+		if (info[key] && typeof info[key] === 'object' && 'bonus' in info[key]) {
+			info[key].bonus = bonuses[key] ?? 0;
+		}
+	}
 
-		pv_max: { title: 'PV MAX', base: 0, bonus: bonuses.pv_max, total: 0 },
+	const equipment_options = book_constants.equipment_options || [];
+	const personalities = book_constants.personalities || {};
 
-		notes: []
-	};
-
-	// Equipment type counters
 	const equip_type_counts = { ARME: 0, ÉQUIPEMENT: 0, OUTIL: 0 };
 
-	// Add equipment stats and count types
 	for (const label of equipment) {
 		const eq = equipment_options.find(op => op.label === label);
-		for (const attr of ['hab', 'adr', 'end', 'cha', 'deg', 'arm', 'crit']) {
-			info[attr].equip += eq[attr] || 0;
+		if (!eq) continue;
+		for (const attr of ['hab', 'adr', 'end', 'cha', 'deg', 'arm', 'crit', 'pv_max']) {
+			if (info[attr] && eq[attr]) {
+				info[attr].equip = (info[attr].equip || 0) + eq[attr];
+			}
 		}
-		equip_type_counts[eq.type]++;
+		if (eq.type) equip_type_counts[eq.type] = (equip_type_counts[eq.type] || 0) + 1;
 	}
 
-	// No HAB for the dagger if user chose the bow or two weapons
 	if (equipment.includes('LA DAGUE') && (equipment.includes("L'ARC") || equip_type_counts.ARME >= 2)) {
 		info.notes.push("<b>LA DAGUE</b> ne vous apporte pas d'<b>HABILETÉ</b> si vous avez <b>L'ARC</b> ou deux <b>ARMES</b>.");
-		info.hab.equip -= 1;
+		if (info.hab) info.hab.equip -= 1;
 	}
 
-	// Determine personality based on equipment
 	if (equip_type_counts.ARME >= 2) info.personality = 'GUERRIER';
 	if (equip_type_counts.ÉQUIPEMENT >= 2) info.personality = 'PRUDENT';
 	if (equip_type_counts.OUTIL >= 2) info.personality = 'PAYSAN';
 
-	// Add peronality stats and total
-	for (const attr of ['hab', 'adr', 'end', 'cha', 'deg', 'arm', 'crit']) {
+	for (const attr of ['hab', 'adr', 'end', 'cha', 'deg', 'arm', 'crit', 'pv_max']) {
 		const stat = info[attr];
+		if (!stat) continue;
 
-		// Perso stats
-		stat.perso += personalities[info.personality][attr] || 0;
+		const perso_obj = personalities[info.personality];
+		if (perso_obj?.[attr]) {
+			stat.perso = (stat.perso || 0) + perso_obj[attr];
+		}
 
-		// Total
-		stat.total = stat.base + stat.equip + stat.perso + stat.bonus;
+		if (attr !== 'pv_max') {
+			stat.total = (stat.base || 0) + (stat.equip || 0) + (stat.perso || 0) + (stat.bonus || 0);
 
-		// Max
-		if (stat.max && stat.total > stat.max) {
-			info.notes.push(`Tu ne peux pas avoir plus de ${stat.max} ${stat.title}`);
-			stat.total = stat.max;
+			if (stat.max && stat.total > stat.max) {
+				info.notes.push(`Tu ne peux pas avoir plus de ${stat.max} ${stat.title}`);
+				stat.total = stat.max;
+			}
 		}
 	}
 
-	// Determine PV max based on END
-	info.pv_max.total = info.end.total * 3;
+	if (info.pv_max && info.end) {
+		info.pv_max.end = info.end.total * 3;
+		info.pv_max.total = info.pv_max.end + (info.pv_max.equip || 0) + (info.pv_max.perso || 0) + (info.pv_max.bonus || 0);
+	}
 
 	return info;
 }
 
-window.SITUATION_TABLE = {
-	'-7': { 1: [0, 12], 2: [0, 9], 3: [1, 8], 4: [2, 6], 5: [2, 5], 6: [3, 4] },
-	'-6': { 1: [1, 8], 2: [1, 7], 3: [1, 6], 4: [2, 5], 5: [2, 5], 6: [3, 4] },
-	'-5': { 1: [1, 7], 2: [1, 6], 3: [1, 5], 4: [2, 5], 5: [3, 4], 6: [4, 4] },
-	'-4': { 1: [1, 6], 2: [2, 6], 3: [2, 5], 4: [2, 4], 5: [3, 3], 6: [4, 3] },
-	'-3': { 1: [2, 6], 2: [2, 5], 3: [2, 4], 4: [3, 4], 5: [3, 3], 6: [4, 3] },
-	'-2': { 1: [2, 6], 2: [2, 5], 3: [2, 4], 4: [3, 3], 5: [4, 3], 6: [5, 3] },
-	'-1': { 1: [3, 6], 2: [3, 5], 3: [3, 4], 4: [3, 3], 5: [4, 3], 6: [5, 3] },
-	0: { 1: [3, 5], 2: [3, 4], 3: [3, 3], 4: [3, 3], 5: [4, 3], 6: [5, 3] },
-	1: { 1: [3, 5], 2: [3, 4], 3: [3, 3], 4: [4, 3], 5: [5, 3], 6: [6, 3] },
-	2: { 1: [3, 5], 2: [3, 4], 3: [3, 3], 4: [4, 2], 5: [5, 2], 6: [6, 2] },
-	3: { 1: [3, 4], 2: [3, 3], 3: [4, 3], 4: [4, 2], 5: [5, 2], 6: [6, 2] },
-	4: { 1: [3, 4], 2: [3, 3], 3: [4, 2], 4: [5, 2], 5: [6, 2], 6: [6, 1] },
-	5: { 1: [4, 4], 2: [4, 3], 3: [5, 2], 4: [5, 2], 5: [6, 1], 6: [7, 1] },
-	6: { 1: [4, 3], 2: [5, 2], 3: [5, 2], 4: [6, 1], 5: [7, 1], 6: [8, 2] },
-	7: { 1: [4, 3], 2: [5, 2], 3: [6, 2], 4: [8, 1], 5: [8, 1], 6: [12, 0] }
-};
-
 window.getSituationDmg = (hab_diff, dice_val) => {
 	const clamped_diff = Math.max(-7, Math.min(7, hab_diff));
-	return window.SITUATION_TABLE[clamped_diff][dice_val];
+	const situation_table = window.CONSTANTS?.[current_book]?.situation_table;
+	return situation_table?.[clamped_diff]?.[dice_val];
 };
