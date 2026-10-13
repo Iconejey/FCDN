@@ -59,9 +59,11 @@ class EquipmentPage extends CustomComponent {
 
 				if (this.$$selected.length === 3) {
 					// Update user data
+					const wealth_from_equipment = this.selected_equipment.reduce((sum, eq) => sum + (eq.wealth || 0), 0);
 					user_data = {
 						...user_data,
-						equipment: this.selected_labels
+						equipment: this.selected_labels,
+						wealth: (constants.default_user_data.wealth || 0) + wealth_from_equipment
 					};
 
 					const infos = getBillyInfo(user_data);
