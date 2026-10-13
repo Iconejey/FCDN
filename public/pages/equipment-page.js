@@ -12,6 +12,7 @@ class EquipmentPage extends CustomComponent {
 	};
 
 	get selected_equipment() {
+		const equipment_options = window.CONSTANTS[current_book].equipment_options;
 		return [...this.$$selected].map(c => equipment_options.find(o => o.label === c.nextElementSibling.innerText));
 	}
 
@@ -39,7 +40,9 @@ class EquipmentPage extends CustomComponent {
 			</div>
 		`;
 
-		let user_data = default_user_data;
+		const constants = window.CONSTANTS[current_book];
+		const equipment_options = constants.equipment_options;
+		let user_data = constants.default_user_data;
 
 		for (const option of equipment_options) {
 			const checkbox_label = emmet`label.checkbox`;
