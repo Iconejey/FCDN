@@ -20,8 +20,8 @@ class EquipmentPage extends CustomComponent {
 
 	connectedCallback() {
 		this.innerHTML = html`
-			<h1>Choix de l'équipement</h1>
-			<p>Tu commences ton aventure avec un équipement de départ. Choisis jusqu'à <b>3 équipements</b> de départ.</p>
+			<h1>Choix du MATÉRIEL</h1>
+			<p>Choisis jusqu'à <b>3 OBJETS</b></p>
 
 			<div class="checkboxes"></div>
 
