@@ -52,6 +52,8 @@ function saveUserData(callback) {
 function getBillyInfo(user_data = {}) {
 	const equipment = user_data?.equipment || [];
 	const bonuses = user_data?.bonuses || {};
+	const respect = user_data?.respect || 0;
+	const resentment = user_data?.resentment || 0;
 	const book_constants = window.CONSTANTS?.[current_book];
 	if (!book_constants) return null;
 
@@ -60,6 +62,22 @@ function getBillyInfo(user_data = {}) {
 	for (const key of Object.keys(info)) {
 		if (info[key] && typeof info[key] === 'object' && 'bonus' in info[key]) {
 			info[key].bonus = bonuses[key] ?? 0;
+		}
+	}
+
+	// Apply opinion bonuses if opinions definition exists
+	if (book_constants.opinions) {
+		const diff = respect - resentment;
+		let key = null;
+		if (diff >= 4) key = 'max_respect';
+		else if (diff >= 2) key = 'high_respect';
+		else if (diff <= -4) key = 'max_resentment';
+		else if (diff <= -2) key = 'high_resentment';
+
+		if (key && book_constants.opinions[key]) {
+			for (const [attr, val] of Object.entries(book_constants.opinions[key])) {
+				if (info[attr]) info[attr].opinion = (info[attr].opinion || 0) + val;
+			}
 		}
 	}
 
@@ -98,7 +116,7 @@ function getBillyInfo(user_data = {}) {
 		}
 
 		if (attr !== 'pv_max') {
-			stat.total = (stat.base || 0) + (stat.equip || 0) + (stat.perso || 0) + (stat.bonus || 0);
+			stat.total = (stat.base || 0) + (stat.equip || 0) + (stat.perso || 0) + (stat.opinion || 0) + (stat.bonus || 0);
 
 			if (stat.max && stat.total > stat.max) {
 				info.notes.push(`Tu ne peux pas avoir plus de ${stat.max} ${stat.title}`);
@@ -109,7 +127,7 @@ function getBillyInfo(user_data = {}) {
 
 	if (info.pv_max && info.end) {
 		info.pv_max.end = info.end.total * 3;
-		info.pv_max.total = info.pv_max.end + (info.pv_max.equip || 0) + (info.pv_max.perso || 0) + (info.pv_max.bonus || 0);
+		info.pv_max.total = info.pv_max.end + (info.pv_max.equip || 0) + (info.pv_max.perso || 0) + (info.pv_max.opinion || 0) + (info.pv_max.bonus || 0);
 	}
 
 	return info;
