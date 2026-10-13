@@ -358,7 +358,10 @@ class BattlePage extends CustomComponent {
 			const list = [
 				{ label: 'Base', value: info.base },
 				{ label: 'Équipement', value: info.equip },
-				{ label: 'Caractère', value: info.perso },
+				{ label: 'Caractère', value: info.perso }
+			];
+			if (info.opinion) list.push({ label: 'Opinion', value: info.opinion });
+			list.push(
 				{ label: 'Bonus', value: info.bonus },
 				{
 					label: 'Ajustement',
@@ -370,7 +373,7 @@ class BattlePage extends CustomComponent {
 				},
 				'separator',
 				{ label: 'Total', value: info.total + this.battle_modifiers[stat], bold: true }
-			];
+			);
 			box.title = info.title;
 			box.show(list);
 		};
