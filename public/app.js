@@ -1,12 +1,21 @@
+let current_book = null;
+
 // Open a page by name and render its component directly inside document.body
 function openPage(page_name) {
 	document.body.innerHTML = '';
 	document.body.appendChild(emmet`${page_name}-page`);
 }
 
-// Run the initial check on load
-window.addEventListener('DOMContentLoaded', () => {
+// Select a book and navigate to dashboard or welcome page
+function selectBook(key) {
+	current_book = key;
 	openPage(getUserData() ? 'dashboard' : 'welcome');
+}
+
+// Run the initial check on load
+window.addEventListener('DOMContentLoaded', async () => {
+	window.CONSTANTS = await (await fetch('/CONSTANTS.json')).json();
+	openPage('books');
 });
 
 const equipment_options = [
@@ -59,13 +68,20 @@ function getUserData() {
 		localStorage.setItem('data', JSON.stringify(data));
 	}
 
-	return data;
+	return current_book ? data[current_book] || null : null;
 }
 
 // Save user data
 function saveUserData(callback) {
-	const new_data = callback(getUserData());
-	if (new_data) localStorage.setItem('data', JSON.stringify(new_data));
+	if (!current_book) return;
+	const string_data = localStorage.getItem('data');
+	const data = string_data ? JSON.parse(string_data) : {};
+
+	const new_book_data = callback(getUserData());
+	if (new_book_data) {
+		data[current_book] = new_book_data;
+		localStorage.setItem('data', JSON.stringify(data));
+	}
 }
 
 // Get Billy info
