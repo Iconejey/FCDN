@@ -11,7 +11,7 @@ class StatsPage extends CustomComponent {
 			<p id="description"></p>
 			<div class="v-split wrap"></div>
 			<div id="notes"></div>
-			<page-btn page="dashboard">Retour</page-btn>
+			<page-btn page="dashboard">Tableau de bord</page-btn>
 		`;
 
 		// Update personality and description
