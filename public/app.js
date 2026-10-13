@@ -26,7 +26,7 @@ function getUserData() {
 	let data = JSON.parse(string_data);
 
 	// Migrate old data format if not up to date
-	if (!data?.FCDN) {
+	if (data.pv) {
 		localStorage.setItem('data_backup', string_data);
 		data = { FCDN: data };
 		localStorage.setItem('data', JSON.stringify(data));
