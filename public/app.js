@@ -48,6 +48,21 @@ function saveUserData(callback) {
 	}
 }
 
+// Get opinion key
+function getOpinionKey(respect = 0, resentment = 0, book = current_book) {
+	const opinions = window.CONSTANTS?.[book]?.opinions;
+	if (!opinions) return null;
+
+	const diff = (respect || 0) - (resentment || 0);
+	let key = null;
+	if (diff >= 4) key = 'max_respect';
+	else if (diff >= 2) key = 'high_respect';
+	else if (diff <= -4) key = 'max_resentment';
+	else if (diff <= -2) key = 'high_resentment';
+
+	return key && opinions[key] ? key : null;
+}
+
 // Get Billy info
 function getBillyInfo(user_data = {}) {
 	const equipment = user_data?.equipment || [];
@@ -66,18 +81,10 @@ function getBillyInfo(user_data = {}) {
 	}
 
 	// Apply opinion bonuses if opinions definition exists
-	if (book_constants.opinions) {
-		const diff = respect - resentment;
-		let key = null;
-		if (diff >= 4) key = 'max_respect';
-		else if (diff >= 2) key = 'high_respect';
-		else if (diff <= -4) key = 'max_resentment';
-		else if (diff <= -2) key = 'high_resentment';
-
-		if (key && book_constants.opinions[key]) {
-			for (const [attr, val] of Object.entries(book_constants.opinions[key])) {
-				if (info[attr]) info[attr].opinion = (info[attr].opinion || 0) + val;
-			}
+	const opinion_key = getOpinionKey(respect, resentment);
+	if (opinion_key && book_constants.opinions?.[opinion_key]) {
+		for (const [attr, val] of Object.entries(book_constants.opinions[opinion_key])) {
+			if (info[attr]) info[attr].opinion = (info[attr].opinion || 0) + val;
 		}
 	}
 

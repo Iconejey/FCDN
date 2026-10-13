@@ -84,8 +84,25 @@ class DashboardPage extends CustomComponent {
 		// Book specific databoxes
 		if (current_book === 'FCDN') this.$glory.show([{ incr: incrStat('glory', 'GLOIRE'), value: user_data.glory }]);
 		if (current_book === 'CDSI') {
-			this.$respect.show([{ incr: incrStat('respect', 'RESPECT'), value: user_data.respect }]);
-			this.$resentment.show([{ incr: incrStat('resentment', 'RESSENTIMENT'), value: user_data.resentment }]);
+			const respect_list = [{ incr: incrStat('respect', 'RESPECT'), value: user_data.respect }];
+			const resentment_list = [{ incr: incrStat('resentment', 'RESSENTIMENT'), value: user_data.resentment }];
+
+			const key = getOpinionKey(user_data.respect, user_data.resentment);
+			const opinions = window.CONSTANTS?.[current_book]?.opinions;
+
+			if (key && opinions?.[key]) {
+				const target_list = key.includes('respect') ? respect_list : resentment_list;
+				target_list.push('separator');
+				const label_map = { cha: 'CHA', end: 'END', crit: 'CRIT', hab: 'HAB', adr: 'ADR', arm: 'ARM', deg: 'DEG' };
+				for (const [attr, val] of Object.entries(opinions[key])) {
+					const label = label_map[attr] || attr.toUpperCase();
+					const val_str = val > 0 ? `+${val}` : `${val}`;
+					target_list.push({ label, value: val_str });
+				}
+			}
+
+			this.$respect.show(respect_list);
+			this.$resentment.show(resentment_list);
 		}
 
 		this.$wealth.show([{ incr: incrStat('wealth', 'RICHESSE'), value: user_data.wealth }]);
