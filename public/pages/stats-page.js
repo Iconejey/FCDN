@@ -54,7 +54,7 @@ class StatsPage extends CustomComponent {
 
 		this.addStat('PV MAX', [
 			//
-			{ label: 'Base', value: infos.pv_max.base },
+			{ label: 'END. x3', value: infos.end.total * 3 },
 			{ incr: incrStat('pv_max'), value: infos.pv_max.bonus },
 			'separator',
 			{ label: 'Total', value: infos.pv_max.total, bold: true }
