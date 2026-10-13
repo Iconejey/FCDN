@@ -1,0 +1,135 @@
+{
+	"FCDN": {
+		"title": "La Forteresse Du Chaudron Noir",
+		"situation_table": {
+			"-7": { "1": [0, 12], "2": [0, 9], "3": [1, 8], "4": [2, 6], "5": [2, 5], "6": [3, 4] },
+			"-6": { "1": [1, 8], "2": [1, 7], "3": [1, 6], "4": [2, 5], "5": [2, 5], "6": [3, 4] },
+			"-5": { "1": [1, 7], "2": [1, 6], "3": [1, 5], "4": [2, 5], "5": [3, 4], "6": [4, 4] },
+			"-4": { "1": [1, 6], "2": [2, 6], "3": [2, 5], "4": [2, 4], "5": [3, 3], "6": [4, 3] },
+			"-3": { "1": [2, 6], "2": [2, 5], "3": [2, 4], "4": [3, 4], "5": [3, 3], "6": [4, 3] },
+			"-2": { "1": [2, 6], "2": [2, 5], "3": [2, 4], "4": [3, 3], "5": [4, 3], "6": [5, 3] },
+			"-1": { "1": [3, 6], "2": [3, 5], "3": [3, 4], "4": [3, 3], "5": [4, 3], "6": [5, 3] },
+			"0": { "1": [3, 5], "2": [3, 4], "3": [3, 3], "4": [3, 3], "5": [4, 3], "6": [5, 3] },
+			"1": { "1": [3, 5], "2": [3, 4], "3": [3, 3], "4": [4, 3], "5": [5, 3], "6": [6, 3] },
+			"2": { "1": [3, 5], "2": [3, 4], "3": [3, 3], "4": [4, 2], "5": [5, 2], "6": [6, 2] },
+			"3": { "1": [3, 4], "2": [3, 3], "3": [4, 3], "4": [4, 2], "5": [5, 2], "6": [6, 2] },
+			"4": { "1": [3, 4], "2": [3, 3], "3": [4, 2], "4": [5, 2], "5": [6, 2], "6": [6, 1] },
+			"5": { "1": [4, 4], "2": [4, 3], "3": [5, 2], "4": [5, 2], "5": [6, 1], "6": [7, 1] },
+			"6": { "1": [4, 3], "2": [5, 2], "3": [5, 2], "4": [6, 1], "5": [7, 1], "6": [8, 2] },
+			"7": { "1": [4, 3], "2": [5, 2], "3": [6, 2], "4": [8, 1], "5": [8, 1], "6": [12, 0] }
+		},
+		"default_user_data": {
+			"equipment": [],
+			"pv": 0,
+			"chance": 0,
+			"glory": 0,
+			"wealth": 0,
+			"bonuses": { "hab": 0, "adr": 0, "end": 0, "cha": 0, "deg": 0, "arm": 0, "crit": 0, "pv_max": 0 },
+			"collected_items": [],
+			"adventure_notes": [],
+			"chap_history": []
+		},
+		"default_info": {
+			"personality": "DÉBROUILLARD",
+			"hab": { "title": "HABILETÉ", "base": 2, "equip": 0, "perso": 0, "bonus": 0, "total": 0 },
+			"adr": { "title": "ADRESSE", "base": 1, "equip": 0, "perso": 0, "bonus": 0, "total": 0, "max": 5 },
+			"end": { "title": "ENDURENCE", "base": 2, "equip": 0, "perso": 0, "bonus": 0, "total": 0 },
+			"cha": { "title": "CHANCE MAX", "base": 3, "equip": 0, "perso": 0, "bonus": 0, "total": 0 },
+			"deg": { "title": "DÉGÂTS", "base": 0, "equip": 0, "perso": 0, "bonus": 0, "total": 0 },
+			"arm": { "title": "ARMURE", "base": 0, "equip": 0, "perso": 0, "bonus": 0, "total": 0 },
+			"crit": { "title": "CRITIQUE", "base": 0, "equip": 0, "perso": 0, "bonus": 0, "total": 0 },
+			"pv_max": { "title": "PV MAX", "base": 0, "bonus": 0, "total": 0 },
+			"notes": []
+		},
+		"equipment_options": [
+			{ "type": "ARME", "label": "L'ÉPEE", "hab": 4 },
+			{ "type": "ARME", "label": "LA LANCE", "hab": 3, "adr": 1 },
+			{ "type": "ARME", "label": "LA MORGENSTERN", "hab": 1, "end": 1, "deg": 1 },
+			{ "type": "ARME", "label": "L'ARC", "hab": 3, "adr": 1, "crit": 4 },
+			{ "type": "ÉQUIPEMENT", "label": "LA COTTE DE MAILLES", "hab": -1, "adr": -1, "end": 1, "arm": 2 },
+			{ "type": "ÉQUIPEMENT", "label": "LA MARMITE", "end": 2, "arm": 1 },
+			{ "type": "ÉQUIPEMENT", "label": "LE PAMPHLET TOURISTIQUE", "cha": 4 },
+			{ "type": "ÉQUIPEMENT", "label": "LE KIT DE SOIN", "cha": 1 },
+			{ "type": "OUTIL", "label": "LA FOURCHE", "hab": 1, "end": 3 },
+			{ "type": "OUTIL", "label": "LA DAGUE", "hab": 1, "crit": 6 },
+			{ "type": "OUTIL", "label": "LE KIT D'ESCALADE", "adr": 1 },
+			{ "type": "OUTIL", "label": "LE SAC DE GRAINS", "end": 2, "cha": 2 }
+		],
+		"personalities": {
+			"GUERRIER": { "hab": 2, "deg": 1, "cha": -1, "description": "Vous infligez <b>+1 DÉGÂTS</b> à toutes vos attaques. Baston !" },
+			"PRUDENT": { "cha": 2, "hab": -1, "description": "Vous pouvez utiliser votre <b>CHANCE</b> lors des combats (Pas encore implémenté)." },
+			"PAYSAN": { "end": 2, "adr": -1, "description": "Peu importe les <b>DÉGATS</b> que vous prenez lors d'une attaque, vous ne perdez pas plus de <b>3 PV</b>." },
+			"DÉBROUILLARD": { "adr": 2, "end": -1, "description": "Vous pouvez relancer le dé une fois lors de la phase d'attaque pour espérer faire mieux." }
+		}
+	},
+	"CDSI": {
+		"title": "La Corne Des Sables d'Ivoire",
+		"situation_table": {
+			"-7": { "1": [0, 12], "2": [0, 9], "3": [1, 8], "4": [2, 6], "5": [2, 5], "6": [3, 4] },
+			"-6": { "1": [1, 8], "2": [1, 7], "3": [1, 6], "4": [2, 5], "5": [2, 5], "6": [3, 4] },
+			"-5": { "1": [1, 7], "2": [1, 6], "3": [1, 5], "4": [2, 5], "5": [3, 4], "6": [4, 4] },
+			"-4": { "1": [1, 6], "2": [2, 6], "3": [2, 5], "4": [2, 4], "5": [3, 3], "6": [4, 3] },
+			"-3": { "1": [2, 6], "2": [2, 5], "3": [2, 4], "4": [3, 4], "5": [3, 3], "6": [4, 3] },
+			"-2": { "1": [2, 6], "2": [2, 5], "3": [2, 4], "4": [3, 3], "5": [4, 3], "6": [5, 3] },
+			"-1": { "1": [3, 6], "2": [3, 5], "3": [3, 4], "4": [3, 3], "5": [4, 3], "6": [5, 3] },
+			"0": { "1": [3, 5], "2": [3, 4], "3": [3, 3], "4": [3, 3], "5": [4, 3], "6": [5, 3] },
+			"1": { "1": [3, 5], "2": [3, 4], "3": [3, 3], "4": [4, 3], "5": [5, 3], "6": [6, 3] },
+			"2": { "1": [3, 5], "2": [3, 4], "3": [3, 3], "4": [4, 2], "5": [5, 2], "6": [6, 2] },
+			"3": { "1": [3, 4], "2": [3, 3], "3": [4, 3], "4": [4, 2], "5": [5, 2], "6": [6, 2] },
+			"4": { "1": [3, 4], "2": [3, 3], "3": [4, 2], "4": [5, 2], "5": [6, 2], "6": [6, 1] },
+			"5": { "1": [4, 4], "2": [4, 3], "3": [5, 2], "4": [5, 2], "5": [6, 1], "6": [7, 1] },
+			"6": { "1": [4, 3], "2": [5, 2], "3": [5, 2], "4": [6, 1], "5": [7, 1], "6": [8, 2] },
+			"7": { "1": [4, 3], "2": [5, 2], "3": [6, 2], "4": [8, 1], "5": [8, 1], "6": [12, 0] }
+		},
+		"default_user_data": {
+			"equipment": [],
+			"pv": 0,
+			"chance": 0,
+			"wealth": 0,
+			"respect": 0,
+			"resentment": 0,
+			"bonuses": { "hab": 0, "adr": 0, "end": 0, "cha": 0, "deg": 0, "arm": 0, "crit": 0, "pv_max": 0 },
+			"collected_items": [],
+			"adventure_notes": [],
+			"chap_history": []
+		},
+		"default_info": {
+			"personality": "DÉBROUILLARD",
+			"hab": { "title": "HABILETÉ", "base": 2, "equip": 0, "perso": 0, "bonus": 0, "total": 0 },
+			"adr": { "title": "ADRESSE", "base": 1, "equip": 0, "perso": 0, "bonus": 0, "total": 0, "max": 5 },
+			"end": { "title": "ENDURENCE", "base": 2, "equip": 0, "perso": 0, "bonus": 0, "total": 0 },
+			"cha": { "title": "CHANCE MAX", "base": 3, "equip": 0, "perso": 0, "bonus": 0, "total": 0 },
+			"deg": { "title": "DÉGÂTS", "base": 0, "equip": 0, "perso": 0, "bonus": 0, "total": 0 },
+			"arm": { "title": "ARMURE", "base": 0, "equip": 0, "perso": 0, "bonus": 0, "total": 0 },
+			"crit": { "title": "CRITIQUE", "base": 0, "equip": 0, "perso": 0, "bonus": 0, "total": 0 },
+			"pv_max": { "title": "PV MAX", "base": 0, "bonus": 0, "total": 0 },
+			"notes": []
+		},
+		"equipment_options": [
+			{ "type": "ARME", "label": "LE SABRE", "hab": 3, "crit": 2 },
+			{ "type": "ARME", "label": "LA LANCE", "hab": 3, "adr": 1 },
+			{ "type": "ARME", "label": "LA PIOCHE", "hab": 2, "pv_max": 2, "deg": 1 },
+			{ "type": "ARME", "label": "L'ARC", "hab": 3, "adr": 1, "crit": 4 },
+			{ "type": "ÉQUIPEMENT", "label": "LA COTTE DE MAILLES", "hab": -1, "adr": -1, "end": 1, "arm": 2 },
+			{ "type": "ÉQUIPEMENT", "label": "LE SCEAU", "end": 1, "arm": 1, "pv_max": 2 },
+			{ "type": "ÉQUIPEMENT", "label": "LE GUIDE TOURISTIQUE", "cha": 3 },
+			{ "type": "ÉQUIPEMENT", "label": "LA BOÎTE DE CRAYONS", "cha": 2, "crit": 1 },
+			{ "type": "OUTIL", "label": "LE FLÉAU À GRAINS", "hab": 1, "end": 2, "pv_max": 2 },
+			{ "type": "OUTIL", "label": "LE COUTEAU CÉRÉMONIEL", "hab": 1, "crit": 5, "wealth": 1 },
+			{ "type": "OUTIL", "label": "LE FILET DE PÊCHE", "end": 1, "adr": 1 },
+			{ "type": "OUTIL", "label": "LE SAC DE GRAINS", "end": 2, "cha": 2 }
+		],
+		"personalities": {
+			"GUERRIER": { "hab": 3, "deg": 1, "cha": -1, "description": "Vous infligez <b>+1 DÉGÂTS</b> à toutes vos attaques. Baston !" },
+			"PRUDENT": { "cha": 3, "hab": -1, "description": "Vous pouvez utiliser votre <b>CHANCE</b> lors des combats (Pas encore implémenté)." },
+			"PAYSAN": { "end": 2, "adr": -1, "pv_max": 2, "description": "Peu importe les <b>DÉGATS</b> que vous prenez lors d'une attaque, vous ne perdez pas plus de <b>3 PV</b>." },
+			"DÉBROUILLARD": { "adr": 2, "end": -1, "crit": 2, "description": "Vous pouvez relancer le dé une fois lors de la phase d'attaque pour espérer faire mieux." }
+		},
+		"opinions": {
+			"max_respect": { "cha": 2 },
+			"high_respect": { "end": 2 },
+			"high_resentment": { "crit": 2 },
+			"max_resentment": { "hab": 2 }
+		}
+	}
+}
