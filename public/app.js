@@ -7,7 +7,6 @@ function openPage(page_name) {
 // Run the initial check on load
 window.addEventListener('DOMContentLoaded', () => {
 	openPage(getUserData() ? 'dashboard' : 'welcome');
-	// openPage(getUserData() ? 'chance' : 'welcome');
 });
 
 const equipment_options = [
@@ -50,7 +49,17 @@ const default_user_data = {
 function getUserData() {
 	const string_data = localStorage.getItem('data');
 	if (!string_data) return null;
-	return JSON.parse(string_data);
+
+	let data = JSON.parse(string_data);
+
+	// Migrate old data format if not up to date
+	if (!data?.FCDN) {
+		localStorage.setItem('data_backup', string_data);
+		data = { FCDN: data };
+		localStorage.setItem('data', JSON.stringify(data));
+	}
+
+	return data;
 }
 
 // Save user data
