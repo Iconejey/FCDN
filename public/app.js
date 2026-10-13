@@ -28,9 +28,9 @@ const equipment_options = [
 ];
 
 const personalities = {
-	GUERRIER: { hab: 2, deg: 1, cha: -1, description: 'Vous infligez +1 DÉGÂTS à toutes vos attaques. Baston !' },
-	PRUDENT: { cha: 2, hab: -1, description: 'Vous pouvez utiliser votre CHANCE lors des combats (Pas encore implémenté).' },
-	PAYSAN: { end: 2, adr: -1, description: "Peu importe les DÉGATS que vous prenez lors d'une attaque, vous ne perdez pas plus de 3 PV." },
+	GUERRIER: { hab: 2, deg: 1, cha: -1, description: 'Vous infligez <b>+1 DÉGÂTS</b> à toutes vos attaques. Baston !' },
+	PRUDENT: { cha: 2, hab: -1, description: 'Vous pouvez utiliser votre <b>CHANCE</b> lors des combats (Pas encore implémenté).' },
+	PAYSAN: { end: 2, adr: -1, description: "Peu importe les <b>DÉGATS</b> que vous prenez lors d'une attaque, vous ne perdez pas plus de <b>3 PV</b>." },
 	DÉBROUILLARD: { adr: 2, end: -1, description: "Vous pouvez relancer le dé une fois lors de la phase d'attaque pour espérer faire mieux." }
 };
 
@@ -92,8 +92,8 @@ function getBillyInfo({ equipment, bonuses }) {
 	}
 
 	// No HAB for the dagger if user chose the bow or two weapons
-	if (equipment.includes('LA DAGUE') && (equipment.includes('LA DAGUE') || equip_type_counts.ARME >= 2)) {
-		info.notes.push("LA DAGUE ne vous apporte pas d'HABILETÉ si vous avez L'ARC ou deux ARMES.");
+	if (equipment.includes('LA DAGUE') && (equipment.includes("L'ARC") || equip_type_counts.ARME >= 2)) {
+		info.notes.push("<b>LA DAGUE</b> ne vous apporte pas d'<b>HABILETÉ</b> si vous avez <b>L'ARC</b> ou deux <b>ARMES</b>.");
 		info.hab.equip -= 1;
 	}
 

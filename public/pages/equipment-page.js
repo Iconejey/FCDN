@@ -7,7 +7,8 @@ class EquipmentPage extends CustomComponent {
 		$main_stats: '#main-stats',
 		$second_stats: '#second-stats',
 		$billy_p: '#billy-p',
-		$stats: '.v-split'
+		$stats: '.v-split',
+		$notes: '#notes'
 	};
 
 	get selected_equipment() {
@@ -30,6 +31,8 @@ class EquipmentPage extends CustomComponent {
 				<data-box id="main-stats"></data-box>
 				<data-box id="second-stats"></data-box>
 			</div>
+
+			<div id="notes" class="notes hidden"></div>
 
 			<div class="centering">
 				<page-btn page="stats" id="validate" disabled>Continuer</page-btn>
@@ -76,10 +79,20 @@ class EquipmentPage extends CustomComponent {
 					const $second_stats = [];
 					for (const attr of ['deg', 'arm', 'crit', 'pv_max']) $second_stats.push({ bullet: true, label: infos[attr].title, value: infos[attr].total });
 					this.$second_stats.show($second_stats);
+
+					if (infos.notes?.length) {
+						this.$notes.innerHTML = infos.notes.map(note => `<p class="note">${note}</p>`).join('');
+						this.$notes.classList.remove('hidden');
+					} else {
+						this.$notes.innerHTML = '';
+						this.$notes.classList.add('hidden');
+					}
 				} else {
 					this.$validate_btn.setAttribute('disabled', '');
 					this.$billy_p.classList.add('hidden');
 					this.$stats.classList.add('hidden');
+					this.$notes.innerHTML = '';
+					this.$notes.classList.add('hidden');
 				}
 			};
 

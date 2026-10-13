@@ -174,9 +174,15 @@ data-box {
 	display: flex;
 	flex-direction: column;
 	gap: 0.5rem;
+	margin-top: 1rem;
 
 	&:empty {
 		display: none;
+	}
+
+	& .note {
+		font-style: italic;
+		font-size: 0.9rem;
 	}
 }
 

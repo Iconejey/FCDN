@@ -17,7 +17,7 @@ class StatsPage extends CustomComponent {
 		// Update personality and description
 		const { personality } = getBillyInfo(getUserData());
 		this.$personality.innerText = personality;
-		this.$description.innerText = personalities[personality].description;
+		this.$description.innerHTML = personalities[personality].description;
 
 		this.update();
 	}
