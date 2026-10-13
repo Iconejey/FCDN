@@ -3,6 +3,8 @@ class DashboardPage extends CustomComponent {
 		$pv: '#pv',
 		$chance: '#chance',
 		$glory: '#glory',
+		$respect: '#respect',
+		$resentment: '#resentment',
 		$wealth: '#wealth',
 		$collected_items: '#collected-items',
 		$adventure_notes: '#adventure-notes',
@@ -17,6 +19,25 @@ class DashboardPage extends CustomComponent {
 		const user_data = getUserData();
 		const infos = getBillyInfo(user_data);
 
+		const extra_boxes_html =
+			current_book === 'FCDN'
+				? html`
+						<div class="v-split">
+							<data-box id="glory" title="GLOIRE" />
+							<data-box id="wealth" title="RICHESSE" />
+						</div>
+					`
+				: html`
+						<div class="v-split">
+							<data-box id="respect" title="RESPECT" />
+							<data-box id="resentment" title="RANCUNE" />
+						</div>
+
+						<div class="v-split">
+							<data-box id="wealth" title="RICHESSE" />
+						</div>
+					`;
+
 		this.innerHTML = html`
 			<h1>Tableau de Bord</h1>
 			<p>Ici, tu peux suivre ton avancée dans l'aventure.</p>
@@ -26,10 +47,7 @@ class DashboardPage extends CustomComponent {
 				<data-box id="chance" title="CHANCE" />
 			</div>
 
-			<div class="v-split">
-				<data-box id="glory" title="GLOIRE" />
-				<data-box id="wealth" title="RICHESSE" />
-			</div>
+			${extra_boxes_html}
 
 			<div class="v-split">
 				<data-box id="collected-items" title="OBJETS RÉCUPÉRÉS" />
@@ -63,8 +81,13 @@ class DashboardPage extends CustomComponent {
 		this.$pv.show([{ incr: incrStat('pv', 'PV', infos.pv_max.total), value: `${user_data.pv} / ${infos.pv_max.total}` }]);
 		this.$chance.show([{ incr: incrStat('chance', 'CHANCE', infos.cha.total), value: `${user_data.chance} / ${infos.cha.total}` }]);
 
-		// GLOIRE and RICHESSE
-		this.$glory.show([{ incr: incrStat('glory', 'GLOIRE'), value: user_data.glory }]);
+		// Book specific databoxes
+		if (current_book === 'FCDN') this.$glory.show([{ incr: incrStat('glory', 'GLOIRE'), value: user_data.glory }]);
+		if (current_book === 'CDSI') {
+			this.$respect.show([{ incr: incrStat('respect', 'RESPECT'), value: user_data.respect }]);
+			this.$resentment.show([{ incr: incrStat('resentment', 'RESSENTIMENT'), value: user_data.resentment }]);
+		}
+
 		this.$wealth.show([{ incr: incrStat('wealth', 'RICHESSE'), value: user_data.wealth }]);
 
 		// Add item
