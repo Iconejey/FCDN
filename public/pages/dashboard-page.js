@@ -169,6 +169,19 @@ class DashboardPage extends CustomComponent {
 			this.update();
 		};
 
+		current_span.oncontextmenu = event => {
+			event.preventDefault();
+			event.stopPropagation();
+			if (current_chap === undefined) return;
+			if (confirm(`Voulez-vous supprimer le chapitre ${current_chap} ?`)) {
+				saveUserData(data => {
+					data.chap_history = (data.chap_history || []).slice(1);
+					return data;
+				});
+				this.update();
+			}
+		};
+
 		chap_list_el.appendChild(current_span);
 
 		if (former_chaps.length > 0) {
