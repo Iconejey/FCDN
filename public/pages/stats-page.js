@@ -31,6 +31,7 @@ class StatsPage extends CustomComponent {
 
 		// Increment stat
 		const incrStat = attr => d => {
+			navigator?.vibrate(10);
 			if (d > 0 && infos[attr].max && infos[attr].total >= infos[attr].max) return;
 			if (!confirm(`Voulez-vous ${d > 0 ? 'ajouter' : 'retirer'} 1 point ${infos[attr].title} bonus ?`)) return;
 			saveUserData(data => {

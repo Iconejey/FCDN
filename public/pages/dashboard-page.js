@@ -68,6 +68,7 @@ class DashboardPage extends CustomComponent {
 
 		// Increment stat
 		const incrStat = (attr, title, max) => d => {
+			navigator?.vibrate(10);
 			if (!confirm(`Voulez-vous ${d > 0 ? 'ajouter' : 'retirer'} 1 point de ${title} ?`)) return;
 			saveUserData(data => {
 				data[attr] += d;
@@ -153,9 +154,10 @@ class DashboardPage extends CustomComponent {
 		current_span.className = 'current-chap';
 		current_span.textContent = current_chap !== undefined ? current_chap : '-';
 
-		current_span.oncontextmenu = event => {
+		current_span.onclick = event => {
 			event.preventDefault();
 			event.stopPropagation();
+			navigator?.vibrate(10);
 			const user_input = prompt('Saisir le nouveau chapitre :');
 			if (!user_input) return;
 			const new_chap = Number(user_input);
