@@ -154,11 +154,11 @@ class DashboardPage extends CustomComponent {
 		current_span.className = 'current-chap';
 		current_span.textContent = current_chap !== undefined ? current_chap : '-';
 
-		current_span.onclick = event => {
+		current_span.onclick = async event => {
 			event.preventDefault();
 			event.stopPropagation();
 			navigator?.vibrate(10);
-			const user_input = prompt('Saisir le nouveau chapitre :');
+			const user_input = await promptNumpad();
 			if (!user_input) return;
 			const new_chap = Number(user_input);
 			if (isNaN(new_chap)) return alert('Veuillez entrer un numéro de chapitre valide.');
