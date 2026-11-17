@@ -10,7 +10,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.wear.compose.material.Text
+import androidx.wear.compose.material3.MaterialTheme
+import androidx.wear.compose.material3.Text
 import com.example.fcdn.data.ApiClient
 import com.example.fcdn.util.QrCodeGenerator
 import kotlinx.coroutines.delay
@@ -42,22 +43,22 @@ fun QrPairingScreen(onPaired: (String) -> Unit) {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Scan to Pair",
-            fontSize = 14.sp,
-            color = Color.White,
+            text = "Scannez pour appairer",
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(6.dp))
         Image(
             bitmap = qr_bitmap,
-            contentDescription = "Pairing QR Code",
+            contentDescription = "Code QR d'appairage",
             modifier = Modifier.size(130.dp)
         )
         Spacer(modifier = Modifier.height(6.dp))
         Text(
-            text = "Open on phone",
-            fontSize = 11.sp,
-            color = Color.Gray,
+            text = "Ouvrez sur le téléphone",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
     }

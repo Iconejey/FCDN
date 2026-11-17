@@ -3,7 +3,6 @@ package com.example.fcdn
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -12,13 +11,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.sp
-import androidx.wear.compose.material.Text
+import androidx.wear.compose.material3.MaterialTheme
+import androidx.wear.compose.material3.Text
 import com.example.fcdn.data.ApiClient
 import com.example.fcdn.ui.BookListScreen
 import com.example.fcdn.ui.ChapterListScreen
 import com.example.fcdn.ui.QrPairingScreen
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -26,126 +27,136 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val prefs = getSharedPreferences("fcdn_prefs", Context.MODE_PRIVATE)
+        val prefs = getSharedPreferences("fcdn_wear_prefs", Context.MODE_PRIVATE)
 
         setContent {
-            var user_id by remember { mutableStateOf(prefs.getString("user_id", null)) }
-            var user_data by remember { mutableStateOf<JSONObject?>(null) }
-            var selected_book by remember { mutableStateOf<String?>(null) }
-            var is_loading by remember { mutableStateOf(false) }
-            val coroutine_scope = rememberCoroutineScope()
-
-            fun saveUserId(new_id: String) {
-                prefs.edit().putString("user_id", new_id).apply()
-                user_id = new_id
-            }
-
-            fun clearUserId() {
-                prefs.edit().remove("user_id").apply()
-                user_id = null
-                user_data = null
-                selected_book = null
-            }
-
-            LaunchedEffect(user_id) {
-                val current_id = user_id
-                if (current_id != null) {
-                    is_loading = true
-                    val loaded = ApiClient.fetchUserData(current_id)
-                    user_data = loaded ?: JSONObject()
-                    is_loading = false
-                }
-            }
-
-            val current_user_id = user_id
-            if (current_user_id == null) {
-                QrPairingScreen(
-                    onPaired = { paired_id ->
-                        saveUserId(paired_id)
-                    }
-                )
-            } else if (is_loading && user_data == null) {
+            MaterialTheme {
                 Box(
-                    modifier = Modifier.fillMaxSize().background(Color.Black),
-                    contentAlignment = Alignment.Center
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black)
                 ) {
-                    Text("Loading...", color = Color.White, fontSize = 14.sp)
+                    AppNavigation(prefs = prefs)
                 }
-            } else {
-                val data_obj = user_data ?: JSONObject()
-                val active_book = selected_book
+            }
+        }
+    }
+}
 
-                if (active_book == null) {
-                    val book_keys = remember(data_obj) {
-                        val keys = mutableListOf<String>()
-                        val iterator = data_obj.keys()
-                        while (iterator.hasNext()) {
-                            keys.add(iterator.next())
-                        }
-                        if (keys.isEmpty()) listOf("FCDN", "CDSI") else keys
+@Composable
+fun AppNavigation(prefs: android.content.SharedPreferences) {
+    var user_id by remember { mutableStateOf(prefs.getString("user_id", null)) }
+    var user_data by remember { mutableStateOf<JSONObject?>(null) }
+    var selected_book by remember { mutableStateOf<String?>(null) }
+    var is_loading by remember { mutableStateOf(false) }
+    var error_msg by remember { mutableStateOf<String?>(null) }
+
+    val coroutine_scope = rememberCoroutineScope()
+
+    fun parseChapHist(data: JSONObject?): Map<String, List<Int>> {
+        if (data == null) return emptyMap()
+        val result = mutableMapOf<String, List<Int>>()
+        val keys = data.keys()
+        while (keys.hasNext()) {
+            val book = keys.next()
+            val book_obj = data.optJSONObject(book)
+            if (book_obj != null) {
+                val arr = book_obj.optJSONArray("chap_history")
+                val list = mutableListOf<Int>()
+                if (arr != null) {
+                    for (i in 0 until arr.length()) {
+                        list.add(arr.getInt(i))
                     }
+                }
+                result[book] = list
+            }
+        }
+        return result
+    }
 
-                    BookListScreen(
-                        book_list = book_keys,
-                        onSelectBook = { book ->
-                            selected_book = book
-                        },
-                        onLogout = {
-                            clearUserId()
-                        }
-                    )
+    fun fetchData() {
+        val uid = user_id ?: return
+        is_loading = true
+        error_msg = null
+        coroutine_scope.launch(Dispatchers.IO) {
+            val data = ApiClient.fetchUserData(uid)
+            withContext(Dispatchers.Main) {
+                is_loading = false
+                if (data != null) {
+                    user_data = data
                 } else {
-                    BackHandler {
+                    error_msg = "Échec du chargement des données"
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(user_id) {
+        if (user_id != null && user_data == null) {
+            fetchData()
+        }
+    }
+
+    if (user_id == null) {
+        QrPairingScreen(
+            onPaired = { new_uid ->
+                prefs.edit().putString("user_id", new_uid).apply()
+                user_id = new_uid
+            }
+        )
+    } else if (is_loading && user_data == null) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            androidx.wear.compose.material.CircularProgressIndicator()
+        }
+    } else if (error_msg != null) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = error_msg ?: "Erreur", color = MaterialTheme.colorScheme.error)
+        }
+    } else {
+        val data = user_data
+        if (data != null) {
+            val parsed_map = parseChapHist(data)
+            if (selected_book == null) {
+                val book_keys = parsed_map.keys.toList()
+                BookListScreen(
+                    book_list = book_keys,
+                    onSelectBook = { book ->
+                        selected_book = book
+                    },
+                    onLogout = {
+                        prefs.edit().remove("user_id").apply()
+                        user_id = null
+                        user_data = null
                         selected_book = null
                     }
-
-                    val book_data = data_obj.optJSONObject(active_book) ?: JSONObject()
-                    val raw_chap_arr = book_data.optJSONArray("chap_history") ?: JSONArray()
-                    val chap_history = remember(raw_chap_arr.toString()) {
-                        val list = mutableListOf<Int>()
-                        for (i in 0 until raw_chap_arr.length()) {
-                            val val_num = raw_chap_arr.optInt(i, -1)
-                            if (val_num >= 0) list.add(val_num)
-                        }
-                        list
-                    }
-
-                    fun updateChapHistory(new_list: List<Int>) {
-                        val new_data_obj = JSONObject(data_obj.toString())
-                        val new_book_obj = new_data_obj.optJSONObject(active_book) ?: JSONObject()
+                )
+            } else {
+                val book = selected_book!!
+                val chap_hist = parsed_map[book] ?: emptyList()
+                ChapterListScreen(
+                    book_name = book,
+                    chap_history = chap_hist,
+                    onBack = { selected_book = null },
+                    onUpdateHistory = { new_hist ->
+                        val book_obj = data.optJSONObject(book) ?: JSONObject()
                         val new_arr = JSONArray()
-                        for (item in new_list) {
-                            new_arr.put(item)
-                        }
-                        new_book_obj.put("chap_history", new_arr)
-                        new_data_obj.put(active_book, new_book_obj)
-                        user_data = new_data_obj
+                        new_hist.forEach { new_arr.put(it) }
+                        book_obj.put("chap_history", new_arr)
+                        data.put(book, book_obj)
 
-                        coroutine_scope.launch {
-                            ApiClient.saveUserData(current_user_id, new_data_obj)
+                        user_data = JSONObject(data.toString())
+
+                        coroutine_scope.launch(Dispatchers.IO) {
+                            ApiClient.saveUserData(user_id!!, data)
                         }
                     }
-
-                    ChapterListScreen(
-                        book_name = active_book,
-                        chap_history = chap_history,
-                        onAddChapter = { new_chap ->
-                            val updated = listOf(new_chap) + chap_history
-                            updateChapHistory(updated)
-                        },
-                        onDeleteCurrentChapter = {
-                            if (chap_history.isNotEmpty()) {
-                                val updated = chap_history.drop(1)
-                                updateChapHistory(updated)
-                            }
-                        },
-                        onPromoteChapter = { target_chap ->
-                            val filtered = chap_history.filter { it != target_chap }
-                            val updated = listOf(target_chap) + filtered
-                            updateChapHistory(updated)
-                        }
-                    )
-                }
+                )
             }
         }
     }

@@ -1,67 +1,55 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Pair Wear OS Watch</title>
+		<title>Appairage Montre Wear OS</title>
+		<link rel="manifest" href="/manifest.json" />
+		<link rel="icon" type="image/png" href="/assets/icon.png" />
+		<link rel="stylesheet" href="/global.css" type="text/css" />
 		<style>
 			body {
-				font-family:
-					system-ui,
-					-apple-system,
-					BlinkMacSystemFont,
-					'Segoe UI',
-					Roboto,
-					sans-serif;
-				background: #121212;
-				color: #ffffff;
 				display: flex;
 				align-items: center;
 				justify-content: center;
 				min-height: 100vh;
-				margin: 0;
 				padding: 1rem;
-				box-sizing: border-box;
+				font-family: 'Times New Roman', Times, serif;
 			}
 
-			.card {
-				background: #1e1e1e;
-				padding: 2.5rem 2rem;
-				border-radius: 16px;
-				max-width: 400px;
+			.pairing-card {
+				border: 2px solid black;
+				padding: 2rem 1.5rem;
+				max-width: 420px;
 				width: 100%;
 				text-align: center;
-				box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 
 				& h2 {
 					margin-bottom: 1rem;
-					font-weight: 600;
 				}
 
 				& p {
-					font-size: 1.05rem;
-					line-height: 1.4;
-					color: #bbbbbb;
+					font-size: 1.1rem;
 				}
 
 				& .status {
 					font-weight: bold;
 					margin-top: 1.5rem;
-					color: #4caf50;
+					color: green;
 				}
 
 				& .error {
 					font-weight: bold;
 					margin-top: 1.5rem;
-					color: #f44336;
+					color: red;
 				}
 			}
 		</style>
 	</head>
 	<body>
-		<div class="card">
-			<h2>Watch Pairing</h2>
-			<p id="msg_el">Linking watch with your web app session...</p>
+		<div class="pairing-card">
+			<h2>Appairage Montre</h2>
+			<p id="msg_el">Association de la montre avec votre session...</p>
 		</div>
 
 		<script>
@@ -72,13 +60,13 @@
 
 			function pairWatch() {
 				if (!token) {
-					msg_el.textContent = 'Invalid request: missing token.';
+					msg_el.textContent = 'Requête invalide : jeton manquant.';
 					msg_el.className = 'error';
 					return;
 				}
 
 				if (!user_id) {
-					msg_el.textContent = 'No local user ID found in browser. Please open the main web app first.';
+					msg_el.textContent = "Aucun identifiant utilisateur trouvé dans le navigateur. Veuillez d'abord vous connecter à l'application web.";
 					msg_el.className = 'error';
 					return;
 				}
@@ -91,15 +79,15 @@
 					.then(r => r.json())
 					.then(res_data => {
 						if (res_data.success) {
-							msg_el.textContent = 'Watch successfully linked!';
+							msg_el.textContent = 'Montre appairée avec succès !';
 							msg_el.className = 'status';
 						} else {
-							msg_el.textContent = 'Pairing failed.';
+							msg_el.textContent = "Échec de l'appairage.";
 							msg_el.className = 'error';
 						}
 					})
-					.catch(err => {
-						msg_el.textContent = 'Network error during pairing.';
+					.catch(() => {
+						msg_el.textContent = "Erreur réseau lors de l'appairage.";
 						msg_el.className = 'error';
 					});
 			}

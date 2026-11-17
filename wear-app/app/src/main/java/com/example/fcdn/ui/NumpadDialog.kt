@@ -13,12 +13,14 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.wear.compose.material.Text
+import androidx.wear.compose.material3.MaterialTheme
+import androidx.wear.compose.material3.Text
 
 @Composable
 fun NumpadDialog(
-    onConfirm: (Int) -> Unit,
-    onCancel: () -> Unit
+    title: String = "Enter Chapter",
+    onConfirm: (Int?) -> Unit,
+    onDismiss: () -> Unit
 ) {
     var input_str by remember { mutableStateOf("") }
 
@@ -31,11 +33,11 @@ fun NumpadDialog(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = if (input_str.isEmpty()) "Enter Chapter" else input_str,
+            text = if (input_str.isEmpty()) title else input_str,
             fontFamily = FontFamily.Serif,
-            fontSize = 20.sp,
+            fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(vertical = 4.dp)
         )
 
@@ -58,20 +60,19 @@ fun NumpadDialog(
                             .size(36.dp)
                             .clip(CircleShape)
                             .background(
-                                if (key == "OK") Color(0xFF2E7D32)
-                                else if (key == "C") Color(0xFFC62828)
-                                else Color(0xFF333333)
+                                if (key == "OK") MaterialTheme.colorScheme.primaryContainer
+                                else if (key == "C") MaterialTheme.colorScheme.errorContainer
+                                else MaterialTheme.colorScheme.surfaceContainer
                             )
                             .clickable {
                                 if (key == "OK") {
                                     val parsed_num = input_str.toIntOrNull()
-                                    if (parsed_num != null) onConfirm(parsed_num)
-                                    else onCancel()
+                                    onConfirm(parsed_num)
                                 } else if (key == "C") {
                                     if (input_str.isNotEmpty()) {
                                         input_str = input_str.dropLast(1)
                                     } else {
-                                        onCancel()
+                                        onDismiss()
                                     }
                                 } else {
                                     if (input_str.length < 5) {
@@ -82,7 +83,9 @@ fun NumpadDialog(
                     ) {
                         Text(
                             text = key,
-                            color = Color.White,
+                            color = if (key == "OK") MaterialTheme.colorScheme.onPrimaryContainer
+                                   else if (key == "C") MaterialTheme.colorScheme.onErrorContainer
+                                   else MaterialTheme.colorScheme.onSurface,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold
                         )

@@ -9,13 +9,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.wear.compose.material.Button
-import androidx.wear.compose.material.ButtonDefaults
-import androidx.wear.compose.material.Text
+import androidx.wear.compose.material3.Button
+import androidx.wear.compose.material3.MaterialTheme
+import androidx.wear.compose.material3.OutlinedButton
+import androidx.wear.compose.material3.Text
 
 @Composable
 fun ConfirmDialog(
-    title: String,
+    message: String,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -28,9 +29,9 @@ fun ConfirmDialog(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = title,
-            color = Color.White,
-            fontSize = 14.sp,
+            text = message,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(bottom = 12.dp)
         )
@@ -38,19 +39,17 @@ fun ConfirmDialog(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Button(
+            OutlinedButton(
                 onClick = onDismiss,
-                colors = ButtonDefaults.secondaryButtonColors(),
-                modifier = Modifier.size(42.dp)
+                modifier = Modifier.size(44.dp)
             ) {
-                Text(text = "No", color = Color.White, fontSize = 12.sp)
+                Text(text = "Non", style = MaterialTheme.typography.labelSmall)
             }
             Button(
                 onClick = onConfirm,
-                colors = ButtonDefaults.primaryButtonColors(),
-                modifier = Modifier.size(42.dp)
+                modifier = Modifier.size(44.dp)
             ) {
-                Text(text = "Yes", color = Color.White, fontSize = 12.sp)
+                Text(text = "Oui", style = MaterialTheme.typography.labelSmall)
             }
         }
     }

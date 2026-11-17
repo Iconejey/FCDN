@@ -14,7 +14,9 @@
 	"main": "server.js",
 	"scripts": {
 		"start": "node server.js",
-		"prod": "pm2 start server.js --name fcdn"
+		"prod": "pm2 start server.js --name fcdn",
+		"wear:build": "cd wear-app && ./gradlew assembleDebug",
+		"wear:install": "cd wear-app && ./gradlew assembleDebug && (adb install -r app/build/outputs/apk/debug/app-debug.apk || $HOME/android-sdk/platform-tools/adb install -r app/build/outputs/apk/debug/app-debug.apk)"
 	},
 	"dependencies": {
 		"express": "^5.2.1",
