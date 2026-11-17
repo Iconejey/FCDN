@@ -1,4 +1,5 @@
 let current_book = null;
+let user_data_store = {};
 
 // Open a page by name and render its component directly inside document.body
 function openPage(page_name) {
@@ -12,39 +13,63 @@ function selectBook(key) {
 	openPage(getUserData() ? 'dashboard' : 'welcome');
 }
 
+function getUserId() {
+	let user_id = localStorage.getItem('user_id');
+	if (!user_id) {
+		user_id = Array.from(crypto.getRandomValues(new Uint8Array(16)), b => (b % 32).toString(32)).join('');
+		localStorage.setItem('user_id', user_id);
+	}
+	return user_id;
+}
+
+async function loadServerData() {
+	const user_id = getUserId();
+	const res = await fetch(`/api/data/${user_id}`);
+	return res.ok ? await res.json() : {};
+}
+
+async function saveServerData(data) {
+	const user_id = getUserId();
+	await fetch(`/api/data/${user_id}`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(data)
+	});
+}
+
 // Run the initial check on load
 window.addEventListener('DOMContentLoaded', async () => {
+	getUserId();
+	const string_data = localStorage.getItem('data');
+
+	if (string_data) {
+		let data = JSON.parse(string_data);
+		if (data.pv) data = { FCDN: data };
+		localStorage.setItem('backup', string_data);
+		localStorage.removeItem('data');
+		user_data_store = data;
+		await saveServerData(user_data_store);
+	} else {
+		user_data_store = await loadServerData();
+	}
+
 	window.CONSTANTS = await (await fetch('/CONSTANTS.json')).json();
 	openPage('books');
 });
 
 // Get user data
 function getUserData() {
-	const string_data = localStorage.getItem('data');
-	if (!string_data) return null;
-
-	let data = JSON.parse(string_data);
-
-	// Migrate old data format if not up to date
-	if (data.pv) {
-		localStorage.setItem('data_backup', string_data);
-		data = { FCDN: data };
-		localStorage.setItem('data', JSON.stringify(data));
-	}
-
-	return current_book ? data[current_book] || null : null;
+	return current_book ? user_data_store[current_book] || null : null;
 }
 
 // Save user data
 function saveUserData(callback) {
 	if (!current_book) return;
-	const string_data = localStorage.getItem('data');
-	const data = string_data ? JSON.parse(string_data) : {};
 
 	const new_book_data = callback(getUserData());
 	if (new_book_data) {
-		data[current_book] = new_book_data;
-		localStorage.setItem('data', JSON.stringify(data));
+		user_data_store[current_book] = new_book_data;
+		saveServerData(user_data_store);
 	}
 }
 
