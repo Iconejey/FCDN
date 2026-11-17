@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Pair Wear OS Watch</title>
+		<style>
+			body {
+				font-family:
+					system-ui,
+					-apple-system,
+					BlinkMacSystemFont,
+					'Segoe UI',
+					Roboto,
+					sans-serif;
+				background: #121212;
+				color: #ffffff;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				min-height: 100vh;
+				margin: 0;
+				padding: 1rem;
+				box-sizing: border-box;
+			}
+
+			.card {
+				background: #1e1e1e;
+				padding: 2.5rem 2rem;
+				border-radius: 16px;
+				max-width: 400px;
+				width: 100%;
+				text-align: center;
+				box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+
+				& h2 {
+					margin-bottom: 1rem;
+					font-weight: 600;
+				}
+
+				& p {
+					font-size: 1.05rem;
+					line-height: 1.4;
+					color: #bbbbbb;
+				}
+
+				& .status {
+					font-weight: bold;
+					margin-top: 1.5rem;
+					color: #4caf50;
+				}
+
+				& .error {
+					font-weight: bold;
+					margin-top: 1.5rem;
+					color: #f44336;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="card">
+			<h2>Watch Pairing</h2>
+			<p id="msg_el">Linking watch with your web app session...</p>
+		</div>
+
+		<script>
+			const url_params = new URLSearchParams(window.location.search);
+			const token = url_params.get('token');
+			const user_id = localStorage.getItem('user_id');
+			const msg_el = document.getElementById('msg_el');
+
+			function pairWatch() {
+				if (!token) {
+					msg_el.textContent = 'Invalid request: missing token.';
+					msg_el.className = 'error';
+					return;
+				}
+
+				if (!user_id) {
+					msg_el.textContent = 'No local user ID found in browser. Please open the main web app first.';
+					msg_el.className = 'error';
+					return;
+				}
+
+				fetch('/api/pair', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ token, user_id })
+				})
+					.then(r => r.json())
+					.then(res_data => {
+						if (res_data.success) {
+							msg_el.textContent = 'Watch successfully linked!';
+							msg_el.className = 'status';
+						} else {
+							msg_el.textContent = 'Pairing failed.';
+							msg_el.className = 'error';
+						}
+					})
+					.catch(err => {
+						msg_el.textContent = 'Network error during pairing.';
+						msg_el.className = 'error';
+					});
+			}
+
+			pairWatch();
+		</script>
+	</body>
+</html>

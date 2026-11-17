@@ -144,3 +144,16 @@ vite.config.ts.timestamp-*
 
 # User data
 data/
+
+# Android & Gradle
+.gradle/
+**/build/
+local.properties
+*.apk
+*.aab
+.idea/
+*.iml
+.DS_Store
+captures/
+.externalNativeBuild/
+.cxx/

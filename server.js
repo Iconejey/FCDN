@@ -6,10 +6,32 @@ const port = 8011;
 
 app.use(express.json());
 
+const pending_pairs = new Map();
+
 const nolib_frontend_path = path.join(path.dirname(require.resolve('nolib/package.json')), 'frontend');
 app.use('/nolib', express.static(nolib_frontend_path));
 
 app.use(express.static('public'));
+
+app.post('/api/pair', (req, res) => {
+	const token = req.body.token;
+	const user_id = req.body.user_id;
+	if (!token || !user_id) return res.status(400).json({ error: 'Missing token or user_id' });
+	pending_pairs.set(token, { user_id, created_at: Date.now() });
+	res.json({ success: true });
+});
+
+app.get('/api/pair/:token', (req, res) => {
+	const token = req.params.token;
+	const pair_data = pending_pairs.get(token);
+	if (!pair_data) return res.json({ user_id: null });
+	pending_pairs.delete(token);
+	res.json({ user_id: pair_data.user_id });
+});
+
+app.get('/id', (req, res) => {
+	res.sendFile(path.resolve(__dirname, 'public', 'id.html'));
+});
 
 app.get('/api/data/:id', (req, res) => {
 	const file_path = path.resolve(__dirname, 'data', `${req.params.id}.json`);
