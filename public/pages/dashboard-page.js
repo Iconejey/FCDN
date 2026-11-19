@@ -6,6 +6,9 @@ class DashboardPage extends CustomComponent {
 		$respect: '#respect',
 		$resentment: '#resentment',
 		$wealth: '#wealth',
+		$impulse: '#impulse',
+		$lucidity: '#lucidity',
+		$equipment: '#equipment',
 		$collected_items: '#collected-items',
 		$adventure_notes: '#adventure-notes',
 		$chap_list: '#chap-list'
@@ -19,24 +22,37 @@ class DashboardPage extends CustomComponent {
 		const user_data = getUserData();
 		const infos = getBillyInfo(user_data);
 
-		const extra_boxes_html =
-			current_book === 'FCDN'
-				? html`
-						<div class="v-split">
-							<data-box id="glory" title="GLOIRE" />
-							<data-box id="wealth" title="RICHESSE" />
-						</div>
-					`
-				: html`
-						<div class="v-split">
-							<data-box id="respect" title="RESPECT" />
-							<data-box id="resentment" title="RANCUNE" />
-						</div>
+		let extra_boxes_html = '';
+		if (current_book === 'FCDN') {
+			extra_boxes_html = html`
+				<div class="v-split">
+					<data-box id="glory" title="GLOIRE" />
+					<data-box id="wealth" title="RICHESSE" />
+				</div>
+			`;
+		} else if (current_book === 'CDSI') {
+			extra_boxes_html = html`
+				<div class="v-split">
+					<data-box id="respect" title="RESPECT" />
+					<data-box id="resentment" title="RANCUNE" />
+				</div>
 
-						<div class="v-split">
-							<data-box id="wealth" title="RICHESSE" />
-						</div>
-					`;
+				<div class="v-split">
+					<data-box id="wealth" title="RICHESSE" />
+				</div>
+			`;
+		} else if (current_book === 'LLDV') {
+			extra_boxes_html = html`
+				<div class="v-split">
+					<data-box id="impulse" title="IMPULSION" />
+					<data-box id="lucidity" title="LUCIDITÉ" />
+				</div>
+
+				<div class="v-split">
+					<data-box id="wealth" title="RICHESSE" />
+				</div>
+			`;
+		}
 
 		this.innerHTML = html`
 			<h1>Tableau de Bord</h1>
@@ -48,6 +64,10 @@ class DashboardPage extends CustomComponent {
 			</div>
 
 			${extra_boxes_html}
+
+			<div class="v-split">
+				<data-box id="equipment" title="ÉQUIPEMENT SÉLECTIONNÉ" />
+			</div>
 
 			<div class="v-split">
 				<data-box id="collected-items" title="OBJETS RÉCUPÉRÉS" />
@@ -71,7 +91,7 @@ class DashboardPage extends CustomComponent {
 			navigator?.vibrate(10);
 			if (!confirm(`Voulez-vous ${d > 0 ? 'ajouter' : 'retirer'} 1 point de ${title} ?`)) return;
 			saveUserData(data => {
-				data[attr] += d;
+				data[attr] = (data[attr] || 0) + d;
 				if (max && data[attr] > max) return alert('Vous avez déjà atteint le maximum pour cette valeur.');
 				return data;
 			});
@@ -105,8 +125,16 @@ class DashboardPage extends CustomComponent {
 			this.$respect.show(respect_list);
 			this.$resentment.show(resentment_list);
 		}
+		if (current_book === 'LLDV') {
+			this.$impulse.show([{ incr: incrStat('impulse', 'IMPULSION'), value: user_data.impulse || 0 }]);
+			this.$lucidity.show([{ incr: incrStat('lucidity', 'LUCIDITÉ'), value: user_data.lucidity || 0 }]);
+		}
 
-		this.$wealth.show([{ incr: incrStat('wealth', 'RICHESSE'), value: user_data.wealth }]);
+		this.$wealth.show([{ incr: incrStat('wealth', 'RICHESSE'), value: user_data.wealth || 0 }]);
+
+		// Selected equipment
+		const equipment_items = (user_data.equipment || []).map(item => ({ label: item, bullet: true }));
+		this.$equipment.show(equipment_items.length ? equipment_items : [{ label: 'Aucun équipement sélectionné', gray: true, bullet: true }]);
 
 		// Add item
 		const addItem = attr => {

@@ -2,6 +2,7 @@ class StatsPage extends CustomComponent {
 	static selectors = {
 		$personality: '#personality',
 		$description: '#description',
+		$evolve_container: '#evolve-container',
 		$v_split: '.v-split'
 	};
 
@@ -9,18 +10,57 @@ class StatsPage extends CustomComponent {
 		this.innerHTML = html`
 			<h1>Billy <span id="personality"></span></h1>
 			<p id="description"></p>
+			<div id="evolve-container" style="margin-bottom: 1rem;"></div>
 			<div class="v-split wrap"></div>
 			<div id="notes"></div>
 			<page-btn page="dashboard">Tableau de bord</page-btn>
 		`;
 
-		// Update personality and description
-		const { personality } = getBillyInfo(getUserData());
+		this.renderPersonality();
+		this.update();
+	}
+
+	renderPersonality() {
+		const user_data = getUserData();
+		const { personality } = getBillyInfo(user_data);
 		const personalities = window.CONSTANTS[current_book].personalities;
 		this.$personality.innerText = personality;
-		this.$description.innerHTML = personalities[personality].description;
+		this.$description.innerHTML = personalities[personality]?.description || '';
 
-		this.update();
+		if (this.$evolve_container) {
+			this.$evolve_container.innerHTML = '';
+			if (current_book === 'LLDV' && !user_data?.is_evolved && personalities[personality]?.ev) {
+				const btn = document.createElement('button');
+				btn.className = 'btn';
+				btn.innerText = 'EVOLUER !';
+				btn.onclick = () => {
+					if (confirm('Voulez-vous faire évoluer votre personnalité ?')) {
+						saveUserData(data => {
+							data.is_evolved = true;
+							return data;
+						});
+						this.renderPersonality();
+						this.update();
+					}
+				};
+				this.$evolve_container.appendChild(btn);
+			} else if (current_book === 'LLDV' && user_data?.is_evolved) {
+				const btn = document.createElement('button');
+				btn.className = 'btn';
+				btn.innerText = 'DÉS-ÉVOLUER !';
+				btn.onclick = () => {
+					if (confirm('Voulez-vous faire dés-évoluer votre personnalité ?')) {
+						saveUserData(data => {
+							data.is_evolved = false;
+							return data;
+						});
+						this.renderPersonality();
+						this.update();
+					}
+				};
+				this.$evolve_container.appendChild(btn);
+			}
+		}
 	}
 
 	update() {

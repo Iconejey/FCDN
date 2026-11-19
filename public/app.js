@@ -138,6 +138,10 @@ function getBillyInfo(user_data = {}) {
 	if (equip_type_counts.ÉQUIPEMENT >= 2) info.personality = 'PRUDENT';
 	if (equip_type_counts.OUTIL >= 2) info.personality = 'PAYSAN';
 
+	if (current_book === 'LLDV' && user_data?.is_evolved && personalities[info.personality]?.ev) {
+		info.personality = personalities[info.personality].ev;
+	}
+
 	for (const attr of ['hab', 'adr', 'end', 'cha', 'deg', 'arm', 'crit', 'pv_max']) {
 		const stat = info[attr];
 		if (!stat) continue;
