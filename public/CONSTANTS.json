@@ -188,7 +188,7 @@
 			{ "type": "ÉQUIPEMENT", "label": "LE GUIDE TOURISTIQUE", "cha": 3 },
 			{ "type": "ÉQUIPEMENT", "label": "LE KIT DE CALLIGRAPHIE", "cha": 3, "adr": 1 },
 			{ "type": "OUTIL", "label": "LA BÈCHE (1M)", "hab": 2, "end": 2 },
-			{ "type": "OUTIL", "label": "LA DAGUE À ROUELLES", "hab": 1, "crit": 8, "wealth": 1 },
+			{ "type": "OUTIL", "label": "LA DAGUE À ROUELLES", "crit": 8 },
 			{ "type": "OUTIL", "label": "LA CHAÎNE MÉTALIQUE", "adr": 1, "arm": 1 },
 			{ "type": "OUTIL", "label": "LA BOUTEILLE D'HUILE UNIVERSELLE", "end": 2, "cha": 3 }
 		],
