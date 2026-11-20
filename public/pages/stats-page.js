@@ -3,7 +3,8 @@ class StatsPage extends CustomComponent {
 		$personality: '#personality',
 		$description: '#description',
 		$evolve_container: '#evolve-container',
-		$v_split: '.v-split'
+		$equipment: '#equipment',
+		$v_split: '.v-split.wrap'
 	};
 
 	connectedCallback() {
@@ -11,6 +12,9 @@ class StatsPage extends CustomComponent {
 			<h1>Billy <span id="personality"></span></h1>
 			<p id="description"></p>
 			<div id="evolve-container" style="margin-bottom: 1rem;"></div>
+			<div class="v-split" style="margin-bottom: 1rem;">
+				<data-box id="equipment" title="ÉQUIPEMENT SÉLECTIONNÉ" />
+			</div>
 			<div class="v-split wrap"></div>
 			<div id="notes"></div>
 			<page-btn page="dashboard">Tableau de bord</page-btn>
@@ -68,6 +72,10 @@ class StatsPage extends CustomComponent {
 		this.$v_split.innerHTML = '';
 		const user_data = getUserData();
 		const infos = getBillyInfo(user_data);
+
+		// Selected equipment
+		const equipment_items = (user_data.equipment || []).map(item => ({ label: item, bullet: true }));
+		this.$equipment.show(equipment_items.length ? equipment_items : [{ label: 'Aucun équipement sélectionné', gray: true, bullet: true }]);
 
 		// Increment stat
 		const incrStat = attr => d => {

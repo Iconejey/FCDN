@@ -8,7 +8,6 @@ class DashboardPage extends CustomComponent {
 		$wealth: '#wealth',
 		$impulse: '#impulse',
 		$lucidity: '#lucidity',
-		$equipment: '#equipment',
 		$collected_items: '#collected-items',
 		$adventure_notes: '#adventure-notes',
 		$chap_list: '#chap-list'
@@ -64,10 +63,6 @@ class DashboardPage extends CustomComponent {
 			</div>
 
 			${extra_boxes_html}
-
-			<div class="v-split">
-				<data-box id="equipment" title="ÉQUIPEMENT SÉLECTIONNÉ" />
-			</div>
 
 			<div class="v-split">
 				<data-box id="collected-items" title="OBJETS RÉCUPÉRÉS" />
@@ -131,10 +126,6 @@ class DashboardPage extends CustomComponent {
 		}
 
 		this.$wealth.show([{ incr: incrStat('wealth', 'RICHESSE'), value: user_data.wealth || 0 }]);
-
-		// Selected equipment
-		const equipment_items = (user_data.equipment || []).map(item => ({ label: item, bullet: true }));
-		this.$equipment.show(equipment_items.length ? equipment_items : [{ label: 'Aucun équipement sélectionné', gray: true, bullet: true }]);
 
 		// Add item
 		const addItem = attr => {
